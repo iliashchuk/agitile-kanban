@@ -1,38 +1,29 @@
-import * as React from "react"
-import {
-  ChakraProvider,
-  Box,
-  Text,
-  Link,
-  VStack,
-  Code,
-  Grid,
-  theme,
-} from "@chakra-ui/react"
-import { ColorModeSwitcher } from "./ColorModeSwitcher"
-import { Logo } from "./Logo"
+import React from 'react';
+import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom';
+import { ChakraProvider, Box, Grid, theme } from '@chakra-ui/react';
 
-export const App = () => (
-  <ChakraProvider theme={theme}>
-    <Box textAlign="center" fontSize="xl">
-      <Grid minH="100vh" p={3}>
-        <ColorModeSwitcher justifySelf="flex-end" />
-        <VStack spacing={8}>
-          <Logo h="40vmin" pointerEvents="none" />
-          <Text>
-            Edit <Code fontSize="xl">src/App.tsx</Code> and save to reload.
-          </Text>
-          <Link
-            color="teal.500"
-            href="https://chakra-ui.com"
-            fontSize="2xl"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn Chakra
-          </Link>
-        </VStack>
-      </Grid>
-    </Box>
-  </ChakraProvider>
-)
+import { ColorModeSwitcher } from './ColorModeSwitcher';
+import { TicketFormProvider } from './components/TicketForm';
+import { Backlog } from './components/Backlog';
+
+export const App = () => {
+  return (
+    <ChakraProvider theme={theme}>
+      <TicketFormProvider>
+        <Box textAlign="center" fontSize="xl">
+          <Grid minH="100vh" p={3}>
+            <ColorModeSwitcher justifySelf="flex-end" />
+            <BrowserRouter>
+              <Switch>
+                <Route path="/backlog">
+                  <Backlog />
+                </Route>
+                <Redirect to="/backlog" />
+              </Switch>
+            </BrowserRouter>
+          </Grid>
+        </Box>
+      </TicketFormProvider>
+    </ChakraProvider>
+  );
+};
