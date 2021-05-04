@@ -1,41 +1,66 @@
 import * as React from 'react';
-import { Badge, HStack, Stack, Text, Spacer, Button } from '@chakra-ui/react';
+import { Badge, HStack, Text, Spacer, Button, Box } from '@chakra-ui/react';
 
-import { Ticket } from '../../domain/Ticket';
 import { TypeIcon } from '../TypeIcon';
 import { useContext } from 'react';
 import { TicketFormContext } from '../TicketForm';
+import { TicketContext } from '../../context/TicketContext';
+import { SprintContext } from '../../context/SprintContext';
+import { SprintStatus } from '../../domain/Sprint';
 
 export const Backlog: React.FC = () => {
-  const tickets: Ticket[] = JSON.parse(localStorage.getItem('tickets') ?? '[]');
-
+  const { tickets } = useContext(TicketContext);
+  const { selectedSprint } = useContext(SprintContext);
   const { open: openTicketForm } = useContext(TicketFormContext);
 
-  console.log(tickets);
+  const displayedTickets = selectedSprint
+    ? tickets.filter((ticket) => selectedSprint.ticketsIds.includes(ticket.id))
+    : tickets;
 
   return (
-    <Stack spacing="0">
-      {tickets.map((ticket, index) => (
-        <HStack
-          padding="2"
-          key={ticket.id}
-          borderTopRadius={index === 0 ? 'base' : 0}
-          borderBottomRadius={index === tickets.length - 1 ? 'base' : 0}
-          border="1px"
-          borderTop={index === 0 ? '1px' : 0}
-          borderColor="gray.500"
-          cursor="pointer"
-          onClick={() => openTicketForm(ticket)}
+    <>
+      <Box mb="4">
+        {displayedTickets.length ? (
+          displayedTickets.map((ticket, index) => (
+            <HStack
+              padding="2"
+              key={ticket.id}
+              borderTopRadius={index === 0 ? 'base' : 0}
+              borderBottomRadius={
+                index === displayedTickets.length - 1 ? 'base' : 0
+              }
+              border="1px"
+              borderTop={index === 0 ? '1px' : 0}
+              borderColor="gray.500"
+              cursor="pointer"
+              onClick={() => openTicketForm({ ticket })}
+            >
+              <TypeIcon type={ticket.type} />
+              <Text fontSize="medium" fontWeight="semibold">
+                {ticket.name}
+              </Text>
+              <Spacer />
+              <Badge fontSize="large">{ticket.id}</Badge>
+            </HStack>
+          ))
+        ) : (
+          <Text fontSize="lg">{`No tickets ${
+            selectedSprint ? 'in this sprint' : 'yet'
+          }.`}</Text>
+        )}
+      </Box>
+      {(!selectedSprint || selectedSprint.status === SprintStatus.Planned) && (
+        <Button
+          isFullWidth
+          onClick={() =>
+            selectedSprint
+              ? openTicketForm({ parentSprintId: selectedSprint.id })
+              : openTicketForm()
+          }
         >
-          <TypeIcon type={ticket.type} />
-          <Text fontSize="medium" fontWeight="semibold">
-            {ticket.name}
-          </Text>
-          <Spacer />
-          <Badge fontSize="large">{ticket.id}</Badge>
-        </HStack>
-      ))}
-      <Button onClick={() => openTicketForm()}>Add new ticket</Button>
-    </Stack>
+          Add new ticket
+        </Button>
+      )}
+    </>
   );
 };
