@@ -13,8 +13,7 @@ import { TicketProvider } from './context/TicketContext';
 export const App = () => {
   return (
     <ChakraProvider theme={theme}>
-      {/* remove basename later */}
-      <BrowserRouter basename="/agitile-kanban">
+      <BrowserRouter>
         <SprintProvider>
           <TicketProvider>
             <TicketFormProvider>
