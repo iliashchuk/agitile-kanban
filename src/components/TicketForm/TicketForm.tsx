@@ -24,8 +24,7 @@ interface Props {
   onSubmit: (ticket: Ticket) => void;
 }
 
-const defaultTicket: Ticket = {
-  id: IdGenerator.generate(),
+const defaultTicket: Omit<Ticket, 'id'> = {
   name: '',
   subtasks: [],
   type: TickerType.Task,
@@ -61,7 +60,7 @@ export const TicketForm: React.FC<Props> = ({ ticket, onSubmit, onCancel }) => {
         }
         return errors;
       }}
-      initialValues={ticket ?? defaultTicket}
+      initialValues={ticket ?? { ...defaultTicket, id: IdGenerator.generate() }}
     >
       {({ values, handleSubmit }) => (
         <Container p="8">

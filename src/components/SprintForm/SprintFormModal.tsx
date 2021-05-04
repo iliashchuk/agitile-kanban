@@ -10,7 +10,7 @@ import { Sprint } from '../../domain/Sprint';
 import { useContext, useState } from 'react';
 import { SprintContext } from '../../context/SprintContext';
 
-interface SprintFormModalContext {
+interface ISprintFormContext {
   close(): void;
   open(Sprint?: string): void;
 }
@@ -45,7 +45,7 @@ export const SprintFormModal: React.FC<SprintFormModalProps> = ({
   );
 };
 
-export const SprintFormContext = React.createContext<SprintFormModalContext>({
+export const SprintFormContext = React.createContext<ISprintFormContext>({
   open: () => null,
   close: () => null,
 });

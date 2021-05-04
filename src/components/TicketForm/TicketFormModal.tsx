@@ -9,10 +9,11 @@ import { TicketForm } from './TicketForm';
 import { Ticket } from '../../domain/Ticket';
 import { useContext, useState } from 'react';
 import { TicketContext } from '../../context/TicketContext';
+import { SprintContext } from '../../context/SprintContext';
 
-interface TicketFormModalContext {
+interface ITicketFormContext {
   close(): void;
-  open(ticket?: Ticket): void;
+  open(options?: { ticket?: Ticket; parentSprintId?: string }): void;
 }
 
 interface TicketFormModalProps {
@@ -39,7 +40,7 @@ export const TicketFormModal: React.FC<TicketFormModalProps> = ({
   );
 };
 
-export const TicketFormContext = React.createContext<TicketFormModalContext>({
+export const TicketFormContext = React.createContext<ITicketFormContext>({
   open: () => null,
   close: () => null,
 });
@@ -48,20 +49,32 @@ export const TicketFormProvider: React.FC = ({ children }) => {
   const disclosure = useDisclosure();
   const { onClose, onOpen } = disclosure;
   const { submitTicket } = useContext(TicketContext);
+  const { addTicketToSprint } = useContext(SprintContext);
   const [editedTicket, setEditedTicket] = useState<Ticket>();
+  const [parentSprintId, setParentSprintId] = useState<string>();
 
-  const open = (ticket?: Ticket) => {
-    setEditedTicket(ticket);
+  const open: ITicketFormContext['open'] = (options = {}) => {
+    setEditedTicket(options.ticket);
+    setParentSprintId(options.parentSprintId);
     onOpen();
+  };
+
+  const handleClose = () => {
+    setEditedTicket(undefined);
+    setParentSprintId(undefined);
+    onClose();
   };
 
   const onSubmit = (ticket: Ticket) => {
     submitTicket(ticket);
-    onClose();
+    if (parentSprintId) {
+      addTicketToSprint(parentSprintId, ticket.id);
+    }
+    handleClose();
   };
 
   return (
-    <TicketFormContext.Provider value={{ open, close: onClose }}>
+    <TicketFormContext.Provider value={{ open, close: handleClose }}>
       {children}
       <TicketFormModal
         onSubmit={onSubmit}

@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom';
-import { ChakraProvider, Box, Grid, theme } from '@chakra-ui/react';
+import { ChakraProvider, Container, Grid, theme } from '@chakra-ui/react';
 
 import { ColorModeSwitcher } from './ColorModeSwitcher';
 import { TicketFormProvider } from './components/TicketForm';
@@ -14,14 +14,14 @@ export const App = () => {
   return (
     <ChakraProvider theme={theme}>
       <BrowserRouter>
-        <TicketProvider>
-          <SprintProvider>
+        <SprintProvider>
+          <TicketProvider>
             <TicketFormProvider>
               <SprintFormProvider>
-                <Box textAlign="center" fontSize="xl">
-                  <Grid minH="100vh" p={3}>
-                    <ColorModeSwitcher justifySelf="flex-end" />
-                    <ControlPanel></ControlPanel>
+                <Grid minH="100vh">
+                  <ColorModeSwitcher justifySelf="flex-end" />
+                  <Container textAlign="center" fontSize="xl">
+                    <ControlPanel />
                     <Switch>
                       <Route path="/sprint/:id">
                         <Backlog />
@@ -31,12 +31,12 @@ export const App = () => {
                       </Route>
                       <Redirect to="/backlog" />
                     </Switch>
-                  </Grid>
-                </Box>
+                  </Container>
+                </Grid>
               </SprintFormProvider>
             </TicketFormProvider>
-          </SprintProvider>
-        </TicketProvider>
+          </TicketProvider>
+        </SprintProvider>
       </BrowserRouter>
     </ChakraProvider>
   );

@@ -8,6 +8,7 @@ import {
   Menu,
   MenuButton,
   MenuItem,
+  Text,
   MenuList,
 } from '@chakra-ui/react';
 import { NavLink } from 'react-router-dom';
@@ -24,7 +25,7 @@ export const ControlPanel: React.FC<Props> = () => {
   const hasNoSprints = sprints.length === 0;
 
   return (
-    <HStack>
+    <HStack mb="4">
       <NavLink to="/backlog">
         <Button>Backlog</Button>
       </NavLink>
@@ -34,14 +35,20 @@ export const ControlPanel: React.FC<Props> = () => {
         </NavLink>
       )}
       <ButtonGroup isAttached>
-        <Menu size="max-content">
+        <Menu>
           <MenuButton as={Button} disabled={hasNoSprints}>
-            {selectedSprint ? selectedSprint.name : 'Select a Sprint'}
+            <Text isTruncated maxWidth="3xs">
+              {selectedSprint ? selectedSprint.name : 'Select a Sprint'}
+            </Text>
           </MenuButton>
-          <MenuList width="max-content">
+          <MenuList maxWidth="3xs">
             {sprints.map((sprint) => (
               <NavLink key={sprint.id} to={`/sprint/${sprint.id}`}>
-                <MenuItem key={sprint.id}>{sprint.name}</MenuItem>
+                <MenuItem key={sprint.id}>
+                  <Text isTruncated maxWidth="3xs">
+                    {sprint.name}
+                  </Text>
+                </MenuItem>
               </NavLink>
             ))}
           </MenuList>

@@ -12,16 +12,14 @@ interface ISprintContext {
   finishSprint(id: string): void;
   selectedSprint?: Sprint;
   submitSprint(sprint: Sprint): void;
+  addTicketToSprint(sprintId: string, ticketId: string): void;
 }
 
 type StorageSprint = Sprint & { startDate: string; endDate: string };
 
-export const SprintContext = createContext<ISprintContext>({
-  sprints: [],
-  submitSprint: () => null,
-  setActiveSprintId: () => null,
-  finishSprint: () => null,
-});
+export const SprintContext = createContext<ISprintContext>(
+  {} as ISprintContext
+);
 
 const getSprintsFromStorage = (): StorageSprint[] =>
   JSON.parse(localStorage.getItem('sprints') ?? '[]');
@@ -114,6 +112,20 @@ export const SprintProvider: React.FC = ({ children }) => {
     );
   };
 
+  const addTicketToSprint: ISprintContext['addTicketToSprint'] = (
+    sprintId,
+    ticketId
+  ) => {
+    handleSetSprints(
+      sprints.map((sprint) => {
+        if (sprint.id === sprintId) {
+          return { ...sprint, ticketsIds: [...sprint.ticketsIds, ticketId] };
+        }
+        return sprint;
+      })
+    );
+  };
+
   return (
     <SprintContext.Provider
       value={{
@@ -123,6 +135,7 @@ export const SprintProvider: React.FC = ({ children }) => {
         setActiveSprintId,
         activeSprintId,
         finishSprint,
+        addTicketToSprint,
       }}
     >
       {children}

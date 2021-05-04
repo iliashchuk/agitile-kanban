@@ -9,10 +9,9 @@ interface ITicketContext {
 
 type StorageTicket = Ticket & { startDate: string; endDate: string };
 
-export const TicketContext = createContext<ITicketContext>({
-  tickets: [],
-  submitTicket: () => null,
-});
+export const TicketContext = createContext<ITicketContext>(
+  {} as ITicketContext
+);
 
 const getTicketsFromStorage = (): StorageTicket[] =>
   JSON.parse(localStorage.getItem('tickets') ?? '[]');
