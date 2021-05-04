@@ -5,7 +5,7 @@ import { App } from './App';
 import * as serviceWorker from './serviceWorker';
 import pages from 'gh-pages';
 
-pages.publish('../build', { branch: 'main' });
+pages.publish('build', { branch: 'main' });
 
 ReactDOM.render(
   <React.StrictMode>
