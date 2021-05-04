@@ -1,6 +1,5 @@
 import * as React from 'react';
 import {
-  Button,
   Modal,
   ModalContent,
   ModalOverlay,
@@ -8,7 +7,8 @@ import {
 } from '@chakra-ui/react';
 import { TicketForm } from './TicketForm';
 import { Ticket } from '../../domain/Ticket';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
+import { TicketContext } from '../../context/TicketContext';
 
 interface TicketFormModalContext {
   close(): void;
@@ -18,6 +18,7 @@ interface TicketFormModalContext {
 interface TicketFormModalProps {
   isOpen: boolean;
   ticket?: Ticket;
+  onSubmit(ticket: Ticket): void;
   onClose(): void;
   onOpen(): void;
 }
@@ -26,24 +27,8 @@ export const TicketFormModal: React.FC<TicketFormModalProps> = ({
   isOpen,
   onClose,
   ticket,
+  onSubmit,
 }) => {
-  const onSubmit = (submitted: Ticket) => {
-    const tickets: Ticket[] = JSON.parse(
-      localStorage.getItem('tickets') ?? '[]'
-    );
-
-    if (ticket) {
-      const ticketIndex = tickets.findIndex(({ id }) => id === ticket.id);
-      tickets[ticketIndex] = submitted;
-    } else {
-      tickets.push(submitted);
-    }
-
-    localStorage.setItem('tickets', JSON.stringify(tickets));
-
-    onClose();
-  };
-
   return (
     <Modal size="xl" isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
@@ -62,6 +47,7 @@ export const TicketFormContext = React.createContext<TicketFormModalContext>({
 export const TicketFormProvider: React.FC = ({ children }) => {
   const disclosure = useDisclosure();
   const { onClose, onOpen } = disclosure;
+  const { submitTicket } = useContext(TicketContext);
   const [editedTicket, setEditedTicket] = useState<Ticket>();
 
   const open = (ticket?: Ticket) => {
@@ -69,10 +55,19 @@ export const TicketFormProvider: React.FC = ({ children }) => {
     onOpen();
   };
 
+  const onSubmit = (ticket: Ticket) => {
+    submitTicket(ticket);
+    onClose();
+  };
+
   return (
     <TicketFormContext.Provider value={{ open, close: onClose }}>
       {children}
-      <TicketFormModal ticket={editedTicket} {...disclosure}></TicketFormModal>
+      <TicketFormModal
+        onSubmit={onSubmit}
+        ticket={editedTicket}
+        {...disclosure}
+      ></TicketFormModal>
     </TicketFormContext.Provider>
   );
 };

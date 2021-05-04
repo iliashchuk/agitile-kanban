@@ -1,21 +1,24 @@
 import * as React from 'react';
 import { Badge, HStack, Stack, Text, Spacer, Button } from '@chakra-ui/react';
 
-import { Ticket } from '../../domain/Ticket';
 import { TypeIcon } from '../TypeIcon';
 import { useContext } from 'react';
 import { TicketFormContext } from '../TicketForm';
+import { TicketContext } from '../../context/TicketContext';
+import { SprintContext } from '../../context/SprintContext';
 
 export const Backlog: React.FC = () => {
-  const tickets: Ticket[] = JSON.parse(localStorage.getItem('tickets') ?? '[]');
-
+  const { tickets } = useContext(TicketContext);
+  const { selectedSprint } = useContext(SprintContext);
   const { open: openTicketForm } = useContext(TicketFormContext);
 
-  console.log(tickets);
+  const displayedTickets = selectedSprint
+    ? tickets.filter((ticket) => selectedSprint.ticketsIds.includes(ticket.id))
+    : tickets;
 
   return (
     <Stack spacing="0">
-      {tickets.map((ticket, index) => (
+      {displayedTickets.map((ticket, index) => (
         <HStack
           padding="2"
           key={ticket.id}

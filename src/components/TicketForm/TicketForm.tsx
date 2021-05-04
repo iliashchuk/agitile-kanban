@@ -52,16 +52,30 @@ export const TicketForm: React.FC<Props> = ({ ticket, onSubmit, onCancel }) => {
   );
 
   return (
-    <Form onSubmit={onSubmit} initialValues={ticket || defaultTicket}>
+    <Form
+      onSubmit={onSubmit}
+      validate={(values) => {
+        const errors: Partial<Record<keyof Ticket, string>> = {};
+        if (!values.name) {
+          errors.name = 'Required';
+        }
+        return errors;
+      }}
+      initialValues={ticket ?? defaultTicket}
+    >
       {({ values, handleSubmit }) => (
         <Container p="8">
           <Stack spacing={8}>
             <Field
               name="name"
-              render={({ input }) => (
+              render={({ input, meta: { error, submitFailed } }) => (
                 <InputGroup size="lg">
                   <InputLeftAddon>{values.id}</InputLeftAddon>
-                  <Input placeholder="Ticket Name" {...input}></Input>
+                  <Input
+                    isInvalid={submitFailed && error}
+                    placeholder="Ticket Name"
+                    {...input}
+                  ></Input>
                   <InputRightAddon padding="unset">
                     {TypeSelect}
                   </InputRightAddon>
