@@ -2,20 +2,29 @@ import * as React from 'react';
 import { Badge, HStack, Text, Spacer, Button, Box } from '@chakra-ui/react';
 
 import { TypeIcon } from '../TypeIcon';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { TicketFormContext } from '../TicketForm';
 import { TicketContext } from '../../context/TicketContext';
 import { SprintContext } from '../../context/SprintContext';
 import { SprintStatus } from '../../domain/Sprint';
+import { Board } from '../Board';
+import { ControlContext } from '../../context/ControlContext';
 
 export const Backlog: React.FC = () => {
   const { tickets } = useContext(TicketContext);
-  const { selectedSprint } = useContext(SprintContext);
+  const { selectedSprint, activeSprintId } = useContext(SprintContext);
   const { open: openTicketForm } = useContext(TicketFormContext);
+  const { isBoardMode } = useContext(ControlContext);
 
   const displayedTickets = selectedSprint
     ? tickets.filter((ticket) => selectedSprint.ticketsIds.includes(ticket.id))
     : tickets;
+
+  const isActiveSprint = selectedSprint && selectedSprint.id === activeSprintId;
+
+  if (isActiveSprint && isBoardMode) {
+    return <Board tickets={displayedTickets} />;
+  }
 
   return (
     <>

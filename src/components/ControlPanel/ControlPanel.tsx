@@ -10,30 +10,53 @@ import {
   MenuItem,
   Text,
   MenuList,
+  FormControl,
+  FormLabel,
+  Switch,
+  Flex,
 } from '@chakra-ui/react';
 import { NavLink } from 'react-router-dom';
 
 import { ReactComponent as SettingsIcon } from './settings.svg';
 
 import { SprintContext } from '../../context/SprintContext';
+import { ControlContext } from '../../context/ControlContext';
 
 interface Props {}
 
 export const ControlPanel: React.FC<Props> = () => {
   const { selectedSprint, sprints, activeSprintId } = useContext(SprintContext);
   const { open: openSprintForm } = useContext(SprintFormContext);
+  const { setIsBoardMode, isBoardMode } = useContext(ControlContext);
   const hasNoSprints = sprints.length === 0;
+
+  let activeSprintControl = null;
+
+  if (activeSprintId) {
+    if (selectedSprint?.id === activeSprintId) {
+      activeSprintControl = (
+        <Flex alignItems="center">
+          <Text mr="2">Board mode</Text>
+          <Switch
+            isChecked={isBoardMode}
+            onChange={(e) => setIsBoardMode(e.target.checked)}
+          />
+        </Flex>
+      );
+    } else {
+      activeSprintControl = (
+        <NavLink to={`/sprint/${activeSprintId}`}>
+          <Button disabled={hasNoSprints}>Active sprint</Button>
+        </NavLink>
+      );
+    }
+  }
 
   return (
     <HStack mb="4">
       <NavLink to="/backlog">
         <Button>Backlog</Button>
       </NavLink>
-      {activeSprintId && (
-        <NavLink to={`/sprint/${activeSprintId}`}>
-          <Button disabled={hasNoSprints}>Active sprint</Button>
-        </NavLink>
-      )}
       <ButtonGroup isAttached>
         <Menu>
           <MenuButton as={Button} disabled={hasNoSprints}>
@@ -62,7 +85,7 @@ export const ControlPanel: React.FC<Props> = () => {
           <SettingsIcon width="24px" />
         </Button>
       </ButtonGroup>
-
+      {activeSprintControl}
       <Spacer />
       <Button onClick={() => openSprintForm()}>Add new sprint</Button>
     </HStack>

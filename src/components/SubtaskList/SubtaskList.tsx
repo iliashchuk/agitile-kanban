@@ -9,8 +9,8 @@ import {
   InputRightElement,
 } from '@chakra-ui/react';
 
-import { Subtask } from '../domain/Ticket';
-import IdGenerator from '../utils/IdGenerator';
+import { Subtask } from '../../domain/Ticket';
+import IdGenerator from '../../utils/IdGenerator';
 
 interface Props {
   subtasks: Subtask[];

@@ -14,7 +14,7 @@ import {
   Button,
 } from '@chakra-ui/react';
 
-import { SubtaskList } from '../SubtaskList';
+import { SubtaskList } from '../SubtaskList/SubtaskList';
 import IdGenerator from '../../utils/IdGenerator';
 import { TickerType, Ticket } from '../../domain/Ticket';
 

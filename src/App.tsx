@@ -9,6 +9,7 @@ import { ControlPanel } from './components/ControlPanel';
 import { Backlog } from './components/Backlog';
 import { SprintProvider } from './context/SprintContext';
 import { TicketProvider } from './context/TicketContext';
+import { ControlProvider } from './context/ControlContext';
 
 export const App = () => {
   return (
@@ -17,25 +18,27 @@ export const App = () => {
       <BrowserRouter basename="/agitile-kanban">
         <SprintProvider>
           <TicketProvider>
-            <TicketFormProvider>
-              <SprintFormProvider>
-                <Grid minH="100vh">
-                  <ColorModeSwitcher justifySelf="flex-end" />
-                  <Container textAlign="center" fontSize="xl">
-                    <ControlPanel />
-                    <Switch>
-                      <Route path="/sprint/:id">
-                        <Backlog />
-                      </Route>
-                      <Route path="/backlog">
-                        <Backlog />
-                      </Route>
-                      <Redirect to="/backlog" />
-                    </Switch>
-                  </Container>
-                </Grid>
-              </SprintFormProvider>
-            </TicketFormProvider>
+            <ControlProvider>
+              <TicketFormProvider>
+                <SprintFormProvider>
+                  <Grid minH="100vh">
+                    <ColorModeSwitcher justifySelf="flex-end" />
+                    <Container textAlign="center" fontSize="xl">
+                      <ControlPanel />
+                      <Switch>
+                        <Route path="/sprint/:id">
+                          <Backlog />
+                        </Route>
+                        <Route path="/backlog">
+                          <Backlog />
+                        </Route>
+                        <Redirect to="/backlog" />
+                      </Switch>
+                    </Container>
+                  </Grid>
+                </SprintFormProvider>
+              </TicketFormProvider>
+            </ControlProvider>
           </TicketProvider>
         </SprintProvider>
       </BrowserRouter>

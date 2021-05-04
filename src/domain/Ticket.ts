@@ -4,6 +4,13 @@ export enum TickerType {
   Bugfix = 'Bugfix',
 }
 
+export enum SubtaskStatus {
+  ToDo = 'To Do',
+  InProgress = 'In Progress',
+  Review = 'Review',
+  Done = 'Done',
+}
+
 export type Subtask = {
   id: string;
   name: string;
@@ -17,5 +24,5 @@ export type Ticket = {
   type: TickerType;
   subtasks?: Subtask[];
   assignee?: string;
-  status?: string;
+  status?: SubtaskStatus;
 };
