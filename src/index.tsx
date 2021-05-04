@@ -3,9 +3,6 @@ import * as React from 'react';
 import ReactDOM from 'react-dom';
 import { App } from './App';
 import * as serviceWorker from './serviceWorker';
-import pages from 'gh-pages';
-
-pages.publish('build', { branch: 'main' });
 
 ReactDOM.render(
   <React.StrictMode>
