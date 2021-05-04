@@ -1,0 +1,21 @@
+{
+  "files": {
+    "main.js": "/agitile-kanban/static/js/main.9124aafe.chunk.js",
+    "main.js.map": "/agitile-kanban/static/js/main.9124aafe.chunk.js.map",
+    "runtime-main.js": "/agitile-kanban/static/js/runtime-main.53335e00.js",
+    "runtime-main.js.map": "/agitile-kanban/static/js/runtime-main.53335e00.js.map",
+    "static/css/2.d22f252f.chunk.css": "/agitile-kanban/static/css/2.d22f252f.chunk.css",
+    "static/js/2.faa361e8.chunk.js": "/agitile-kanban/static/js/2.faa361e8.chunk.js",
+    "static/js/2.faa361e8.chunk.js.map": "/agitile-kanban/static/js/2.faa361e8.chunk.js.map",
+    "index.html": "/agitile-kanban/index.html",
+    "static/css/2.d22f252f.chunk.css.map": "/agitile-kanban/static/css/2.d22f252f.chunk.css.map",
+    "static/js/2.faa361e8.chunk.js.LICENSE.txt": "/agitile-kanban/static/js/2.faa361e8.chunk.js.LICENSE.txt",
+    "static/media/settings.87ba233a.svg": "/agitile-kanban/static/media/settings.87ba233a.svg"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.53335e00.js",
+    "static/css/2.d22f252f.chunk.css",
+    "static/js/2.faa361e8.chunk.js",
+    "static/js/main.9124aafe.chunk.js"
+  ]
+}
