@@ -10,8 +10,6 @@ import {
   MenuItem,
   Text,
   MenuList,
-  FormControl,
-  FormLabel,
   Switch,
   Flex,
 } from '@chakra-ui/react';

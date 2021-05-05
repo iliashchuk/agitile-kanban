@@ -1,10 +1,11 @@
 import React, { createContext, useState } from 'react';
 
-import { Ticket } from '../domain/Ticket';
+import { Ticket, TicketStatus } from '../domain/Ticket';
 
 interface ITicketContext {
   tickets: Ticket[];
   submitTicket(ticket: Ticket): void;
+  changeTicketState(ticketId: string, status: TicketStatus): void;
 }
 
 type StorageTicket = Ticket & { startDate: string; endDate: string };
@@ -38,11 +39,25 @@ export const TicketProvider: React.FC = ({ children }) => {
     setTickets(currentTickets);
   };
 
+  const changeTicketState: ITicketContext['changeTicketState'] = (
+    ticketId,
+    status
+  ) => {
+    console.log('here?', ticketId, status);
+
+    const ticket = tickets.find(({ id }) => id === ticketId);
+    if (!ticket) {
+      return;
+    }
+    submitTicket({ ...ticket, status });
+  };
+
   return (
     <TicketContext.Provider
       value={{
         tickets,
         submitTicket,
+        changeTicketState,
       }}
     >
       {children}

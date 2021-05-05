@@ -1,5 +1,13 @@
 import * as React from 'react';
-import { Badge, HStack, Text, Spacer, Button, Box } from '@chakra-ui/react';
+import {
+  Badge,
+  HStack,
+  Text,
+  Spacer,
+  Button,
+  Box,
+  Stack,
+} from '@chakra-ui/react';
 
 import { TypeIcon } from '../TypeIcon';
 import { useContext, useState } from 'react';
@@ -27,8 +35,8 @@ export const Backlog: React.FC = () => {
   }
 
   return (
-    <>
-      <Box mb="4">
+    <Stack height="md" maxHeight="md">
+      <Box mb="4" overflowY="auto">
         {displayedTickets.length ? (
           displayedTickets.map((ticket, index) => (
             <HStack
@@ -42,7 +50,7 @@ export const Backlog: React.FC = () => {
               borderTop={index === 0 ? '1px' : 0}
               borderColor="gray.500"
               cursor="pointer"
-              onClick={() => openTicketForm({ ticket })}
+              onClick={() => openTicketForm({ ticketId: ticket.id })}
             >
               <TypeIcon type={ticket.type} />
               <Text fontSize="medium" fontWeight="semibold">
@@ -70,6 +78,6 @@ export const Backlog: React.FC = () => {
           Add new ticket
         </Button>
       )}
-    </>
+    </Stack>
   );
 };

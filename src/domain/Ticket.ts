@@ -4,12 +4,19 @@ export enum TickerType {
   Bugfix = 'Bugfix',
 }
 
-export enum SubtaskStatus {
+export enum TicketStatus {
   ToDo = 'To Do',
   InProgress = 'In Progress',
   Review = 'Review',
   Done = 'Done',
 }
+
+export enum TicketDNDTypes {
+  TICKET = 'TICKET',
+  COLUMN = 'COLUMN',
+}
+
+export const TicketStatuses = Object.values(TicketStatus) as TicketStatus[];
 
 export type Subtask = {
   id: string;
@@ -20,9 +27,9 @@ export type Subtask = {
 export type Ticket = {
   name: string;
   id: string;
-  description?: string;
+  status: TicketStatus;
   type: TickerType;
+  description?: string;
   subtasks?: Subtask[];
   assignee?: string;
-  status?: SubtaskStatus;
 };

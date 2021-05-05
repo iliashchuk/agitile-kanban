@@ -23,7 +23,7 @@ export const App = () => {
                 <SprintFormProvider>
                   <Grid minH="100vh">
                     <ColorModeSwitcher justifySelf="flex-end" />
-                    <Container textAlign="center" fontSize="xl">
+                    <Container textAlign="center" maxW="80vw" fontSize="xl">
                       <ControlPanel />
                       <Switch>
                         <Route path="/sprint/:id">

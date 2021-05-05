@@ -13,7 +13,7 @@ import { SprintContext } from '../../context/SprintContext';
 
 interface ITicketFormContext {
   close(): void;
-  open(options?: { ticket?: Ticket; parentSprintId?: string }): void;
+  open(options?: { ticketId?: string; parentSprintId?: string }): void;
 }
 
 interface TicketFormModalProps {
@@ -50,11 +50,12 @@ export const TicketFormProvider: React.FC = ({ children }) => {
   const { onClose, onOpen } = disclosure;
   const { submitTicket } = useContext(TicketContext);
   const { addTicketToSprint } = useContext(SprintContext);
+  const { tickets } = useContext(TicketContext);
   const [editedTicket, setEditedTicket] = useState<Ticket>();
   const [parentSprintId, setParentSprintId] = useState<string>();
 
   const open: ITicketFormContext['open'] = (options = {}) => {
-    setEditedTicket(options.ticket);
+    setEditedTicket(tickets.find(({ id }) => id === options.ticketId));
     setParentSprintId(options.parentSprintId);
     onOpen();
   };

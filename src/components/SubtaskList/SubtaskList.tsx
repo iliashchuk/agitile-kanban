@@ -14,17 +14,24 @@ import IdGenerator from '../../utils/IdGenerator';
 
 interface Props {
   subtasks: Subtask[];
-  onChange(subtasks: Subtask[]): void;
+  onChange?(subtasks: Subtask[]): void;
 }
 
 export const SubtaskList: React.FC<Props> = ({ subtasks, onChange }) => {
   const [newSubtaskName, setNewSubtaskName] = useState('');
+  const isReadonly = !onChange;
 
   const onEdit = (subtask: Subtask) => {
+    if (!onChange) {
+      return;
+    }
     onChange([...subtasks.filter(({ id }) => id !== subtask.id), subtask]);
   };
 
   const onAddNew = () => {
+    if (!onChange) {
+      return;
+    }
     onChange([
       ...subtasks,
       { name: newSubtaskName, isCompleted: false, id: IdGenerator.generate() },
@@ -37,6 +44,7 @@ export const SubtaskList: React.FC<Props> = ({ subtasks, onChange }) => {
         <InputGroup size="md" key={subtask.id}>
           <InputLeftAddon>{subtask.id}</InputLeftAddon>
           <Input
+            disabled={isReadonly}
             value={subtask.name}
             onChange={(e) => onEdit({ ...subtask, name: e.target.value })}
           />
@@ -51,16 +59,23 @@ export const SubtaskList: React.FC<Props> = ({ subtasks, onChange }) => {
         </InputGroup>
       ))}
 
-      <InputGroup size="md" alignItems="center">
-        <Input
-          placeholder="New subtask name"
-          value={newSubtaskName}
-          onChange={(e) => setNewSubtaskName(e.target.value)}
-        />
-        <Button size="sm" marginLeft={4} colorScheme="green" onClick={onAddNew}>
-          Add
-        </Button>
-      </InputGroup>
+      {!isReadonly && (
+        <InputGroup size="md" alignItems="center">
+          <Input
+            placeholder="New subtask name"
+            value={newSubtaskName}
+            onChange={(e) => setNewSubtaskName(e.target.value)}
+          />
+          <Button
+            size="sm"
+            marginLeft={4}
+            colorScheme="green"
+            onClick={onAddNew}
+          >
+            Add
+          </Button>
+        </InputGroup>
+      )}
     </Stack>
   );
 };

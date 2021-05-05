@@ -16,7 +16,7 @@ import {
 
 import { SubtaskList } from '../SubtaskList/SubtaskList';
 import IdGenerator from '../../utils/IdGenerator';
-import { TickerType, Ticket } from '../../domain/Ticket';
+import { TickerType, Ticket, TicketStatus } from '../../domain/Ticket';
 
 interface Props {
   ticket?: Ticket;
@@ -28,6 +28,7 @@ const defaultTicket: Omit<Ticket, 'id'> = {
   name: '',
   subtasks: [],
   type: TickerType.Task,
+  status: TicketStatus.ToDo,
 };
 
 export const TicketForm: React.FC<Props> = ({ ticket, onSubmit, onCancel }) => {
