@@ -1,29 +1,34 @@
-import { Badge } from '@chakra-ui/layout';
-import * as React from 'react';
-import { TickerType } from '../../domain/Ticket';
+import { Badge, BadgeProps } from '@chakra-ui/layout';
+import React from 'react';
+import { TicketType } from '../../domain/Ticket';
 
 interface Props {
-  type: TickerType;
+  type: TicketType;
+  label?: string;
 }
 
-export const TypeIcon: React.FC<Props> = ({ type }) => {
+export const TypeIcon: React.FC<Props> = ({ type, label }) => {
+  const commonProps: BadgeProps = {
+    fontSize: 'medium',
+    borderRadius: 'md',
+  };
   switch (type) {
-    case TickerType.Task:
+    case TicketType.Task:
       return (
-        <Badge fontSize="medium" bg="blue.300">
-          {TickerType.Task}
+        <Badge {...commonProps} bg="blue.300">
+          {label ? label : TicketType.Task}
         </Badge>
       );
-    case TickerType.Story:
+    case TicketType.Story:
       return (
-        <Badge fontSize="medium" bg="green.300">
-          {TickerType.Story}
+        <Badge {...commonProps} bg="green.300">
+          {label ? label : TicketType.Story}
         </Badge>
       );
-    case TickerType.Bugfix:
+    case TicketType.Bugfix:
       return (
-        <Badge fontSize="medium" bg="red.300">
-          {TickerType.Bugfix}
+        <Badge {...commonProps} bg="red.300">
+          {label ? label : TicketType.Bugfix}
         </Badge>
       );
   }

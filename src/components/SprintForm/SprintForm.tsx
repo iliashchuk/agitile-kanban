@@ -21,7 +21,6 @@ import {
 } from '@chakra-ui/react';
 import { Field, Form } from 'react-final-form';
 import DatePicker from 'react-datepicker';
-import { v4 } from 'uuid';
 import formatDate from 'date-fns/format';
 
 import 'react-datepicker/dist/react-datepicker.css';
@@ -37,13 +36,12 @@ export interface SprintFormProps {
   onCancel(): void;
 }
 
-const defaultSprint: Sprint = {
-  id: v4(),
+const defaultSprint: Omit<Sprint, '_id'> = {
   name: '',
   startDate: new Date(),
   endDate: new Date(),
   status: SprintStatus.Planned,
-  ticketsIds: [],
+  tickets: [],
 };
 
 export const SprintForm: React.FC<SprintFormProps> = ({
@@ -69,7 +67,7 @@ export const SprintForm: React.FC<SprintFormProps> = ({
       return null;
     }
 
-    const { status, id } = sprint;
+    const { status, _id: id } = sprint;
 
     switch (status) {
       case SprintStatus.Planned:
@@ -182,7 +180,7 @@ export const SprintForm: React.FC<SprintFormProps> = ({
             </Flex>
 
             {!isTicketSelectorDisabled && (
-              <Field<Sprint['ticketsIds']> name="ticketsIds">
+              <Field<Sprint['tickets']> name="tickets">
                 {({ input }) => (
                   <Box>
                     <Wrap justify={input.value.length ? 'start' : 'center'}>
@@ -192,8 +190,8 @@ export const SprintForm: React.FC<SprintFormProps> = ({
                         </MenuButton>
                         <MenuList>
                           {tickets
-                            .filter(({ id }) => !input.value.includes(id))
-                            .map(({ id: ticketId }) => (
+                            .filter(({ _id: id }) => !input.value.includes(id))
+                            .map(({ _id: ticketId }) => (
                               <MenuItem
                                 key={ticketId}
                                 onClick={() => {
@@ -202,7 +200,7 @@ export const SprintForm: React.FC<SprintFormProps> = ({
                               >
                                 {ticketId}:&nbsp;
                                 {
-                                  tickets.find(({ id }) => ticketId === id)
+                                  tickets.find(({ _id: id }) => ticketId === id)
                                     ?.name
                                 }
                               </MenuItem>
