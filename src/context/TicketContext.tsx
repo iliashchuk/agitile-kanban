@@ -8,6 +8,7 @@ interface ITicketContext {
   tickets: Ticket[];
   ticketsLoading: boolean;
   idPrefix: string;
+  completeSubtask(ticketId: string, subtaskId: string): void;
   submitTicket(ticket: Ticket): void;
   changeTicketState(ticketId: string, status: TicketStatus): void;
 }
@@ -39,6 +40,25 @@ export const TicketProvider: React.FC = ({ children }) => {
     await put(ticket);
   };
 
+  const completeSubtask: ITicketContext['completeSubtask'] = async (
+    ticketId,
+    subtaskId
+  ) => {
+    const ticket = tickets.find(({ _id }) => _id === ticketId);
+    if (!ticket?.subtasks) {
+      return;
+    }
+
+    ticket.subtasks = ticket.subtasks.map((subtask) => {
+      if (subtask._id === subtaskId) {
+        return { ...subtask, isCompleted: true };
+      }
+      return subtask;
+    });
+
+    submitTicket(ticket);
+  };
+
   const changeTicketState: ITicketContext['changeTicketState'] = (
     ticketId,
     status
@@ -50,6 +70,7 @@ export const TicketProvider: React.FC = ({ children }) => {
     <TicketContext.Provider
       value={{
         tickets,
+        completeSubtask,
         ticketsLoading,
         idPrefix,
         submitTicket,

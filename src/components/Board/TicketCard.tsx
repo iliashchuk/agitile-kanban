@@ -44,7 +44,7 @@ export const TicketCard: React.FC<Props> = ({
       </Flex>
       <Text fontSize="large">&nbsp;{name}</Text>
       {subtasks && !!subtasks.length && (
-        <SubtaskList subtasks={subtasks}></SubtaskList>
+        <SubtaskList ticketId={_id} subtasks={subtasks}></SubtaskList>
       )}
     </Stack>
   );

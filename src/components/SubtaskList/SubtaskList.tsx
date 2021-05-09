@@ -14,11 +14,16 @@ import { TicketContext } from '../../context/TicketContext';
 
 interface Props {
   subtasks: Subtask[];
+  ticketId?: string;
   onChange?(subtasks: Partial<Subtask>[]): void;
 }
 
-export const SubtaskList: React.FC<Props> = ({ subtasks, onChange }) => {
-  const { idPrefix } = useContext(TicketContext);
+export const SubtaskList: React.FC<Props> = ({
+  subtasks,
+  onChange,
+  ticketId,
+}) => {
+  const { idPrefix, completeSubtask } = useContext(TicketContext);
   const [newSubtaskName, setNewSubtaskName] = useState('');
   const isReadonly = !onChange;
 
@@ -36,22 +41,38 @@ export const SubtaskList: React.FC<Props> = ({ subtasks, onChange }) => {
     onChange([...subtasks, { name: newSubtaskName, isCompleted: false }]);
   };
 
+  const handleCheckboxChange = (subtask: Subtask) => {
+    if (onChange) {
+      onEdit(subtask);
+      return;
+    }
+
+    if (!ticketId || !subtask.isCompleted) {
+      return;
+    }
+
+    completeSubtask(ticketId, subtask._id);
+  };
+
   return (
-    <Stack spacing="2">
+    <Stack spacing="2" onClick={(e) => e.stopPropagation()} cursor="default">
       {subtasks.map((subtask) => (
-        <InputGroup size="md" key={subtask._id}>
+        <InputGroup size="sm" key={subtask._id}>
           <InputLeftAddon>{subtask._id ?? idPrefix}</InputLeftAddon>
           <Input
-            disabled={isReadonly}
+            // disabled={isReadonly}
             value={subtask.name}
             onChange={(e) => onEdit({ ...subtask, name: e.target.value })}
           />
           <InputRightElement>
             <Checkbox
               isChecked={subtask.isCompleted}
-              onChange={(e) =>
-                onEdit({ ...subtask, isCompleted: e.target.checked })
-              }
+              onChange={(e) => {
+                handleCheckboxChange({
+                  ...subtask,
+                  isCompleted: e.target.checked,
+                });
+              }}
             />
           </InputRightElement>
         </InputGroup>
