@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useContext } from 'react';
 import { Form, Field } from 'react-final-form';
 import {
   Container,
@@ -16,6 +16,7 @@ import {
 
 import { SubtaskList } from '../SubtaskList/SubtaskList';
 import { TicketType, Ticket, TicketStatus } from '../../domain/Ticket';
+import { TicketContext } from '../../context/TicketContext';
 
 interface Props {
   ticket?: Ticket;
@@ -31,6 +32,8 @@ const defaultTicket: Omit<Ticket, '_id'> = {
 };
 
 export const TicketForm: React.FC<Props> = ({ ticket, onSubmit, onCancel }) => {
+  const { idPrefix } = useContext(TicketContext);
+
   const TypeSelect = (
     <Field name="type">
       {({ input }) => (
@@ -69,7 +72,7 @@ export const TicketForm: React.FC<Props> = ({ ticket, onSubmit, onCancel }) => {
               name="name"
               render={({ input, meta: { error, submitFailed } }) => (
                 <InputGroup size="lg">
-                  <InputLeftAddon>{values._id}</InputLeftAddon>
+                  <InputLeftAddon>{values._id ?? idPrefix}</InputLeftAddon>
                   <Input
                     isInvalid={submitFailed && error}
                     placeholder="Ticket Name"

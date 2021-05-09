@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import {
   Input,
   InputGroup,
@@ -10,6 +10,7 @@ import {
 } from '@chakra-ui/react';
 
 import { Subtask } from '../../domain/Ticket';
+import { TicketContext } from '../../context/TicketContext';
 
 interface Props {
   subtasks: Subtask[];
@@ -17,6 +18,7 @@ interface Props {
 }
 
 export const SubtaskList: React.FC<Props> = ({ subtasks, onChange }) => {
+  const { idPrefix } = useContext(TicketContext);
   const [newSubtaskName, setNewSubtaskName] = useState('');
   const isReadonly = !onChange;
 
@@ -38,7 +40,7 @@ export const SubtaskList: React.FC<Props> = ({ subtasks, onChange }) => {
     <Stack spacing="2">
       {subtasks.map((subtask) => (
         <InputGroup size="md" key={subtask._id}>
-          <InputLeftAddon>{subtask._id}</InputLeftAddon>
+          <InputLeftAddon>{subtask._id ?? idPrefix}</InputLeftAddon>
           <Input
             disabled={isReadonly}
             value={subtask.name}

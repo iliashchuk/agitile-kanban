@@ -7,6 +7,7 @@ import { Ticket, TicketStatus } from '../domain/Ticket';
 interface ITicketContext {
   tickets: Ticket[];
   ticketsLoading: boolean;
+  idPrefix: string;
   submitTicket(ticket: Ticket): void;
   changeTicketState(ticketId: string, status: TicketStatus): void;
 }
@@ -22,6 +23,12 @@ export const TicketProvider: React.FC = ({ children }) => {
     `${API_URL}/tickets`,
     {},
     [updatedData]
+  );
+
+  const { data: idPrefix = '' } = useFetch<string>(
+    `${API_URL}/id-prefix`,
+    {},
+    []
   );
 
   const submitTicket = async (ticket: Ticket) => {
@@ -44,6 +51,7 @@ export const TicketProvider: React.FC = ({ children }) => {
       value={{
         tickets,
         ticketsLoading,
+        idPrefix,
         submitTicket,
         changeTicketState,
       }}

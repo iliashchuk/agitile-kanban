@@ -1,5 +1,5 @@
 import { Badge, BadgeProps } from '@chakra-ui/layout';
-import * as React from 'react';
+import React from 'react';
 import { TicketType } from '../../domain/Ticket';
 
 interface Props {
