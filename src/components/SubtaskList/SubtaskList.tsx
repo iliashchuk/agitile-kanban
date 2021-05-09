@@ -10,11 +10,10 @@ import {
 } from '@chakra-ui/react';
 
 import { Subtask } from '../../domain/Ticket';
-import IdGenerator from '../../utils/IdGenerator';
 
 interface Props {
   subtasks: Subtask[];
-  onChange?(subtasks: Subtask[]): void;
+  onChange?(subtasks: Partial<Subtask>[]): void;
 }
 
 export const SubtaskList: React.FC<Props> = ({ subtasks, onChange }) => {
@@ -25,20 +24,14 @@ export const SubtaskList: React.FC<Props> = ({ subtasks, onChange }) => {
     if (!onChange) {
       return;
     }
-    onChange([
-      ...subtasks.filter(({ _id: id }) => id !== subtask._id),
-      subtask,
-    ]);
+    onChange([...subtasks.filter(({ _id }) => _id !== subtask._id), subtask]);
   };
 
   const onAddNew = () => {
     if (!onChange) {
       return;
     }
-    onChange([
-      ...subtasks,
-      { name: newSubtaskName, isCompleted: false, _id: IdGenerator.generate() },
-    ]);
+    onChange([...subtasks, { name: newSubtaskName, isCompleted: false }]);
   };
 
   return (
