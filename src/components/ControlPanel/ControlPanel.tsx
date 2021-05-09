@@ -31,7 +31,7 @@ export const ControlPanel: React.FC<Props> = () => {
   let activeSprintControl = null;
 
   if (activeSprintId) {
-    if (selectedSprint?.id === activeSprintId) {
+    if (selectedSprint?._id === activeSprintId) {
       activeSprintControl = (
         <Flex alignItems="center">
           <Text mr="2">Board mode</Text>
@@ -64,8 +64,8 @@ export const ControlPanel: React.FC<Props> = () => {
           </MenuButton>
           <MenuList maxWidth="3xs">
             {sprints.map((sprint) => (
-              <NavLink key={sprint.id} to={`/sprint/${sprint.id}`}>
-                <MenuItem key={sprint.id}>
+              <NavLink key={sprint._id} to={`/sprint/${sprint._id}`}>
+                <MenuItem key={sprint._id}>
                   <Text isTruncated maxWidth="3xs">
                     {sprint.name}
                   </Text>
@@ -77,7 +77,7 @@ export const ControlPanel: React.FC<Props> = () => {
         <Button
           borderLeft="1px solid"
           borderColor="gray.300"
-          onClick={() => openSprintForm(selectedSprint?.id)}
+          onClick={() => openSprintForm(selectedSprint?._id)}
           disabled={hasNoSprints || !selectedSprint}
         >
           <SettingsIcon width="24px" />

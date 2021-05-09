@@ -25,7 +25,10 @@ export const SubtaskList: React.FC<Props> = ({ subtasks, onChange }) => {
     if (!onChange) {
       return;
     }
-    onChange([...subtasks.filter(({ id }) => id !== subtask.id), subtask]);
+    onChange([
+      ...subtasks.filter(({ _id: id }) => id !== subtask._id),
+      subtask,
+    ]);
   };
 
   const onAddNew = () => {
@@ -34,15 +37,15 @@ export const SubtaskList: React.FC<Props> = ({ subtasks, onChange }) => {
     }
     onChange([
       ...subtasks,
-      { name: newSubtaskName, isCompleted: false, id: IdGenerator.generate() },
+      { name: newSubtaskName, isCompleted: false, _id: IdGenerator.generate() },
     ]);
   };
 
   return (
     <Stack spacing="2">
       {subtasks.map((subtask) => (
-        <InputGroup size="md" key={subtask.id}>
-          <InputLeftAddon>{subtask.id}</InputLeftAddon>
+        <InputGroup size="md" key={subtask._id}>
+          <InputLeftAddon>{subtask._id}</InputLeftAddon>
           <Input
             disabled={isReadonly}
             value={subtask.name}

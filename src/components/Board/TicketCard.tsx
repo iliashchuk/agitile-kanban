@@ -10,7 +10,7 @@ import { TicketFormContext } from '../TicketForm';
 interface Props extends Ticket {}
 
 export const TicketCard: React.FC<Props> = ({
-  id,
+  _id,
   name,
   type,
   assignee,
@@ -21,7 +21,7 @@ export const TicketCard: React.FC<Props> = ({
 
   const [{ isDragging }, drag] = useDrag(() => ({
     type: TicketDNDTypes.TICKET,
-    item: { id, status },
+    item: { _id, status },
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
@@ -35,11 +35,11 @@ export const TicketCard: React.FC<Props> = ({
       bg="white"
       cursor="pointer"
       borderRadius="lg"
-      onClick={() => open({ ticketId: id })}
+      onClick={() => open({ ticketId: _id })}
       opacity={isDragging ? 0.5 : 1}
     >
       <Flex alignItems="center" justifyContent="space-between">
-        <TypeIcon type={type} label={id} />
+        <TypeIcon type={type} label={_id} />
         <Text>{assignee}</Text>
       </Flex>
       <Text fontSize="large">&nbsp;{name}</Text>

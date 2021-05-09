@@ -5,10 +5,10 @@ export enum SprintStatus {
 }
 
 export type Sprint = {
-  id: string;
+  _id: string;
   name: string;
   startDate: Date;
   endDate: Date;
   status: SprintStatus;
-  ticketsIds: string[];
+  tickets: string[];
 };

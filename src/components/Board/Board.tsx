@@ -11,7 +11,6 @@ interface Props {
 }
 
 export const Board: React.FC<Props> = ({ tickets }) => {
-  console.log(TicketStatuses);
   return (
     <DndProvider backend={HTML5Backend}>
       <Grid heigh="md" templateColumns="repeat(4, 1fr)" gap={4}>

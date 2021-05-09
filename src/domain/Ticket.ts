@@ -1,4 +1,4 @@
-export enum TickerType {
+export enum TicketType {
   Story = 'Story',
   Task = 'Task',
   Bugfix = 'Bugfix',
@@ -19,16 +19,16 @@ export enum TicketDNDTypes {
 export const TicketStatuses = Object.values(TicketStatus) as TicketStatus[];
 
 export type Subtask = {
-  id: string;
+  _id: string;
   name: string;
   isCompleted: boolean;
 };
 
 export type Ticket = {
   name: string;
-  id: string;
+  _id: string;
   status: TicketStatus;
-  type: TickerType;
+  type: TicketType;
   description?: string;
   subtasks?: Subtask[];
   assignee?: string;

@@ -53,7 +53,7 @@ export const SprintFormContext = React.createContext<ISprintFormContext>({
 export const SprintFormProvider: React.FC = ({ children }) => {
   const disclosure = useDisclosure();
   const { onClose, onOpen } = disclosure;
-  const { submitSprint, setActiveSprintId, finishSprint, sprints } = useContext(
+  const { submitSprint, startSprint, finishSprint, sprints } = useContext(
     SprintContext
   );
   const [editedSprintId, setEditedSprintId] = useState<string>();
@@ -73,9 +73,9 @@ export const SprintFormProvider: React.FC = ({ children }) => {
       {children}
       <SprintFormModal
         onSubmit={onSubmit}
-        startSprint={setActiveSprintId}
+        startSprint={startSprint}
         finishSprint={finishSprint}
-        sprint={sprints.find(({ id }) => id === editedSprintId)}
+        sprint={sprints.find(({ _id: id }) => id === editedSprintId)}
         onCancel={onClose}
         {...disclosure}
       ></SprintFormModal>

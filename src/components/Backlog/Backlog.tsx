@@ -10,7 +10,7 @@ import {
 } from '@chakra-ui/react';
 
 import { TypeIcon } from '../TypeIcon';
-import { useContext, useState } from 'react';
+import { useContext } from 'react';
 import { TicketFormContext } from '../TicketForm';
 import { TicketContext } from '../../context/TicketContext';
 import { SprintContext } from '../../context/SprintContext';
@@ -25,10 +25,11 @@ export const Backlog: React.FC = () => {
   const { isBoardMode } = useContext(ControlContext);
 
   const displayedTickets = selectedSprint
-    ? tickets.filter((ticket) => selectedSprint.ticketsIds.includes(ticket.id))
+    ? tickets.filter((ticket) => selectedSprint.tickets.includes(ticket._id))
     : tickets;
 
-  const isActiveSprint = selectedSprint && selectedSprint.id === activeSprintId;
+  const isActiveSprint =
+    selectedSprint && selectedSprint._id === activeSprintId;
 
   if (isActiveSprint && isBoardMode) {
     return <Board tickets={displayedTickets} />;
@@ -41,7 +42,7 @@ export const Backlog: React.FC = () => {
           displayedTickets.map((ticket, index) => (
             <HStack
               padding="2"
-              key={ticket.id}
+              key={ticket._id}
               borderTopRadius={index === 0 ? 'base' : 0}
               borderBottomRadius={
                 index === displayedTickets.length - 1 ? 'base' : 0
@@ -50,14 +51,14 @@ export const Backlog: React.FC = () => {
               borderTop={index === 0 ? '1px' : 0}
               borderColor="gray.500"
               cursor="pointer"
-              onClick={() => openTicketForm({ ticketId: ticket.id })}
+              onClick={() => openTicketForm({ ticketId: ticket._id })}
             >
               <TypeIcon type={ticket.type} />
               <Text fontSize="medium" fontWeight="semibold">
                 {ticket.name}
               </Text>
               <Spacer />
-              <Badge fontSize="large">{ticket.id}</Badge>
+              <Badge fontSize="large">{ticket._id}</Badge>
             </HStack>
           ))
         ) : (
@@ -71,7 +72,7 @@ export const Backlog: React.FC = () => {
           isFullWidth
           onClick={() =>
             selectedSprint
-              ? openTicketForm({ parentSprintId: selectedSprint.id })
+              ? openTicketForm({ parentSprintId: selectedSprint._id })
               : openTicketForm()
           }
         >

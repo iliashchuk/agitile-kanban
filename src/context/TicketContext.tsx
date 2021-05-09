@@ -1,61 +1,49 @@
-import React, { createContext, useState } from 'react';
+import React, { createContext } from 'react';
+import useFetch from 'use-http';
+import { API_URL } from '../config';
 
 import { Ticket, TicketStatus } from '../domain/Ticket';
 
 interface ITicketContext {
   tickets: Ticket[];
+  ticketsLoading: boolean;
   submitTicket(ticket: Ticket): void;
   changeTicketState(ticketId: string, status: TicketStatus): void;
 }
-
-type StorageTicket = Ticket & { startDate: string; endDate: string };
 
 export const TicketContext = createContext<ITicketContext>(
   {} as ITicketContext
 );
 
-const getTicketsFromStorage = (): StorageTicket[] =>
-  JSON.parse(localStorage.getItem('tickets') ?? '[]');
-
 export const TicketProvider: React.FC = ({ children }) => {
-  const [tickets, setTickets] = useState<Ticket[]>(getTicketsFromStorage());
+  const { post, put, data: updatedData } = useFetch(`${API_URL}/ticket`);
 
-  const submitTicket = (submitted: Ticket) => {
-    const currentTickets: Ticket[] = JSON.parse(
-      localStorage.getItem('tickets') ?? '[]'
-    );
+  const { data: tickets = [], loading: ticketsLoading } = useFetch<Ticket[]>(
+    `${API_URL}/tickets`,
+    {},
+    [updatedData]
+  );
 
-    const sprintIndex = currentTickets.findIndex(
-      ({ id }) => id === submitted.id
-    );
-
-    if (sprintIndex !== -1) {
-      currentTickets[sprintIndex] = submitted;
-    } else {
-      currentTickets.push({ ...submitted });
+  const submitTicket = async (ticket: Ticket) => {
+    if (!ticket._id) {
+      await post(ticket);
+      return;
     }
-
-    localStorage.setItem('tickets', JSON.stringify(currentTickets));
-    setTickets(currentTickets);
+    await put(ticket);
   };
 
   const changeTicketState: ITicketContext['changeTicketState'] = (
     ticketId,
     status
   ) => {
-    console.log('here?', ticketId, status);
-
-    const ticket = tickets.find(({ id }) => id === ticketId);
-    if (!ticket) {
-      return;
-    }
-    submitTicket({ ...ticket, status });
+    put({ _id: ticketId, status });
   };
 
   return (
     <TicketContext.Provider
       value={{
         tickets,
+        ticketsLoading,
         submitTicket,
         changeTicketState,
       }}

@@ -55,7 +55,7 @@ export const TicketFormProvider: React.FC = ({ children }) => {
   const [parentSprintId, setParentSprintId] = useState<string>();
 
   const open: ITicketFormContext['open'] = (options = {}) => {
-    setEditedTicket(tickets.find(({ id }) => id === options.ticketId));
+    setEditedTicket(tickets.find(({ _id: id }) => id === options.ticketId));
     setParentSprintId(options.parentSprintId);
     onOpen();
   };
@@ -69,7 +69,7 @@ export const TicketFormProvider: React.FC = ({ children }) => {
   const onSubmit = (ticket: Ticket) => {
     submitTicket(ticket);
     if (parentSprintId) {
-      addTicketToSprint(parentSprintId, ticket.id);
+      addTicketToSprint(parentSprintId, ticket._id);
     }
     handleClose();
   };

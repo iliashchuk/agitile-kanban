@@ -15,8 +15,7 @@ import {
 } from '@chakra-ui/react';
 
 import { SubtaskList } from '../SubtaskList/SubtaskList';
-import IdGenerator from '../../utils/IdGenerator';
-import { TickerType, Ticket, TicketStatus } from '../../domain/Ticket';
+import { TicketType, Ticket, TicketStatus } from '../../domain/Ticket';
 
 interface Props {
   ticket?: Ticket;
@@ -24,10 +23,10 @@ interface Props {
   onSubmit: (ticket: Ticket) => void;
 }
 
-const defaultTicket: Omit<Ticket, 'id'> = {
+const defaultTicket: Omit<Ticket, '_id'> = {
   name: '',
   subtasks: [],
-  type: TickerType.Task,
+  type: TicketType.Task,
   status: TicketStatus.ToDo,
 };
 
@@ -43,9 +42,9 @@ export const TicketForm: React.FC<Props> = ({ ticket, onSubmit, onCancel }) => {
           borderLeftRadius={0}
           isFullWidth
         >
-          <option value={TickerType.Task}>{TickerType.Task}</option>
-          <option value={TickerType.Story}>{TickerType.Story}</option>
-          <option value={TickerType.Bugfix}>{TickerType.Bugfix}</option>
+          <option value={TicketType.Task}>{TicketType.Task}</option>
+          <option value={TicketType.Story}>{TicketType.Story}</option>
+          <option value={TicketType.Bugfix}>{TicketType.Bugfix}</option>
         </Select>
       )}
     </Field>
@@ -61,7 +60,7 @@ export const TicketForm: React.FC<Props> = ({ ticket, onSubmit, onCancel }) => {
         }
         return errors;
       }}
-      initialValues={ticket ?? { ...defaultTicket, id: IdGenerator.generate() }}
+      initialValues={ticket ?? { ...defaultTicket }}
     >
       {({ values, handleSubmit }) => (
         <Container p="8">
@@ -70,7 +69,7 @@ export const TicketForm: React.FC<Props> = ({ ticket, onSubmit, onCancel }) => {
               name="name"
               render={({ input, meta: { error, submitFailed } }) => (
                 <InputGroup size="lg">
-                  <InputLeftAddon>{values.id}</InputLeftAddon>
+                  <InputLeftAddon>{values._id}</InputLeftAddon>
                   <Input
                     isInvalid={submitFailed && error}
                     placeholder="Ticket Name"
@@ -94,7 +93,7 @@ export const TicketForm: React.FC<Props> = ({ ticket, onSubmit, onCancel }) => {
               )}
             </Field>
 
-            {values.type === TickerType.Story && (
+            {values.type === TicketType.Story && (
               <Box textAlign="left">
                 <Text mb="2" fontSize="md">
                   Subtasks:

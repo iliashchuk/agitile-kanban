@@ -1,31 +1,28 @@
 import React, { createContext, useState } from 'react';
 import { useRouteMatch } from 'react-router-dom';
 import parseDate from 'date-fns/parseISO';
+import useFetch from 'use-http';
 
 import { Sprint, SprintStatus } from '../domain/Sprint';
 import { SprintParams } from '../domain/Router';
+import { API_URL } from '../config';
 
 interface ISprintContext {
   sprints: Sprint[];
-  activeSprintId?: string;
-  setActiveSprintId(id?: string): void;
-  finishSprint(id: string): void;
   selectedSprint?: Sprint;
+  activeSprintId?: string;
+  sprintsLoading: boolean;
+  startSprint(id?: string): void;
+  finishSprint(id: string): void;
   submitSprint(sprint: Sprint): void;
   addTicketToSprint(sprintId: string, ticketId: string): void;
 }
 
-type StorageSprint = Sprint & { startDate: string; endDate: string };
+type ResponseSprint = Sprint & { startDate: string; endDate: string };
 
 export const SprintContext = createContext<ISprintContext>(
   {} as ISprintContext
 );
-
-const getSprintsFromStorage = (): StorageSprint[] =>
-  JSON.parse(localStorage.getItem('sprints') ?? '[]');
-
-const setSprintsToStorage = (sprints: Sprint[]) =>
-  localStorage.setItem('sprints', JSON.stringify(sprints));
 
 const getActiveSprintIdFromStorage = (): string | undefined =>
   localStorage.getItem('activeSprintId') || undefined;
@@ -40,99 +37,75 @@ const setActiveSprintIdToStorage = (id?: string) => {
 
 export const SprintProvider: React.FC = ({ children }) => {
   const match = useRouteMatch<SprintParams>('/sprint/:id');
+
   const [activeSprintId, setLocalActiveSprintId] = useState(
     getActiveSprintIdFromStorage()
   );
-  const [sprints, setSprints] = useState<Sprint[]>(
-    getSprintsFromStorage().map((sprint) => ({
-      ...sprint,
-      startDate: parseDate(sprint.startDate),
-      endDate: parseDate(sprint.endDate),
-    }))
+
+  const { post, put, data: updatedData } = useFetch<Sprint>(
+    `${API_URL}/sprint`
   );
 
-  const handleSetSprints = (sprints: Sprint[]) => {
-    setSprints(sprints);
-    setSprintsToStorage(sprints);
+  const { data: sprints = [], loading: sprintsLoading } = useFetch<
+    ResponseSprint[]
+  >(`${API_URL}/sprints`, {}, [updatedData]);
+
+  const submitSprint = async (sprint: Sprint) => {
+    if (!sprint._id) {
+      await post(sprint);
+      return;
+    }
+    await put(sprint);
   };
 
-  const handleSetActiveSprintId = (id?: string) => {
+  const setActiveSprintId = (id?: string) => {
     setActiveSprintIdToStorage(id);
     setLocalActiveSprintId(id);
   };
 
-  const selectedSprint = sprints.find(({ id }) => id === match?.params.id);
+  const selectedSprint = sprints.find(({ _id: id }) => id === match?.params.id);
 
-  const submitSprint: ISprintContext['submitSprint'] = (submitted) => {
-    const currentSprints: Sprint[] = JSON.parse(
-      localStorage.getItem('sprints') ?? '[]'
-    );
-
-    const sprintIndex = currentSprints.findIndex(
-      ({ id }) => id === submitted.id
-    );
-
-    if (sprintIndex !== -1) {
-      currentSprints[sprintIndex] = submitted;
-    } else {
-      currentSprints.push({ ...submitted });
-    }
-
-    handleSetSprints(currentSprints);
-  };
-
-  const setActiveSprintId: ISprintContext['setActiveSprintId'] = (sprintId) => {
+  const startSprint: ISprintContext['startSprint'] = (sprintId) => {
     if (sprintId && activeSprintId) {
       // add logs
       return;
     }
-    handleSetActiveSprintId(sprintId);
+    setActiveSprintId(sprintId);
     if (sprintId) {
-      handleSetSprints(
-        sprints.map((sprint) => {
-          if (sprint.id === sprintId) {
-            return { ...sprint, status: SprintStatus.InProgress };
-          }
-          return sprint;
-        })
-      );
+      put({ _id: sprintId, status: SprintStatus.InProgress });
     }
   };
 
   const finishSprint: ISprintContext['finishSprint'] = (sprintId) => {
     setActiveSprintId(undefined);
-
-    handleSetSprints(
-      sprints.map((sprint) => {
-        if (sprint.id === sprintId) {
-          return { ...sprint, status: SprintStatus.Finished };
-        }
-        return sprint;
-      })
-    );
+    put({ _id: sprintId, status: SprintStatus.Finished });
   };
 
   const addTicketToSprint: ISprintContext['addTicketToSprint'] = (
     sprintId,
     ticketId
   ) => {
-    handleSetSprints(
-      sprints.map((sprint) => {
-        if (sprint.id === sprintId) {
-          return { ...sprint, ticketsIds: [...sprint.ticketsIds, ticketId] };
-        }
-        return sprint;
-      })
-    );
+    put({
+      _id: sprintId,
+      tickets: [
+        ...(sprints.find(({ _id }) => _id === sprintId)?.tickets ?? []),
+        ticketId,
+      ],
+    });
   };
 
   return (
     <SprintContext.Provider
       value={{
-        sprints,
+        sprints: sprints.map((sprint) => ({
+          ...sprint,
+          startDate: parseDate(sprint.startDate),
+          endDate: parseDate(sprint.endDate),
+        })),
         submitSprint,
         selectedSprint,
-        setActiveSprintId,
+        sprintsLoading,
+        startSprint,
         activeSprintId,
         finishSprint,
         addTicketToSprint,

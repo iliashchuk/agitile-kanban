@@ -1,4 +1,4 @@
-import { Stack } from '@chakra-ui/react';
+import { Text, Stack } from '@chakra-ui/react';
 import React, { useContext } from 'react';
 import { useDrop } from 'react-dnd';
 
@@ -16,7 +16,7 @@ export const Column: React.FC<Props> = ({ tickets, status }) => {
 
   const [{ isOver }, drop] = useDrop<Ticket, void, { isOver: boolean }>(() => ({
     accept: TicketDNDTypes.TICKET,
-    drop: ({ id, status: ticketStatus }) => changeTicketState(id, status),
+    drop: ({ _id }) => changeTicketState(_id, status),
     collect: (monitor) => ({
       isOver: monitor.isOver(),
     }),
@@ -32,8 +32,11 @@ export const Column: React.FC<Props> = ({ tickets, status }) => {
       borderRadius="lg"
       ref={drop}
     >
+      <Text fontWeight="bold" fontSize="lg">
+        {status}
+      </Text>
       {tickets.map((ticket) => (
-        <TicketCard key={ticket.id} {...ticket}></TicketCard>
+        <TicketCard key={ticket._id} {...ticket}></TicketCard>
       ))}
     </Stack>
   );
