@@ -104,6 +104,7 @@ export const TicketForm: React.FC<Props> = ({ ticket, onSubmit, onCancel }) => {
                 <Field name="subtasks">
                   {({ input }) => (
                     <SubtaskList
+                      ticketId={ticket?._id}
                       subtasks={input.value}
                       onChange={input.onChange}
                     />

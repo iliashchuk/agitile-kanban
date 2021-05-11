@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom';
 import { ChakraProvider, Container, Grid, theme } from '@chakra-ui/react';
 import { Provider as ApiProvider, CachePolicies } from 'use-http';
@@ -17,12 +17,15 @@ const apiOptions = {
   cachePolicy: CachePolicies.NETWORK_ONLY,
 };
 
-export const App = () => {
+interface Props {
+  history?: History;
+}
+
+export const App: FC<Props> = () => {
   return (
     <ChakraProvider theme={theme}>
       <ApiProvider url={API_URL} options={apiOptions}>
-        {/* remove basename later */}
-        <BrowserRouter basename="/agitile-kanban">
+        <BrowserRouter>
           <SprintProvider>
             <TicketProvider>
               <ControlProvider>
