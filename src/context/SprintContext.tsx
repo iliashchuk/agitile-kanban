@@ -1,4 +1,4 @@
-import React, { createContext, useState } from 'react';
+import React, { createContext, useEffect, useState } from 'react';
 import { useRouteMatch } from 'react-router-dom';
 import parseDate from 'date-fns/parseISO';
 import useFetch from 'use-http';
@@ -49,6 +49,18 @@ export const SprintProvider: React.FC = ({ children }) => {
   const { data: sprints = [], loading: sprintsLoading } = useFetch<
     ResponseSprint[]
   >(`${API_URL}/sprints`, {}, [updatedData]);
+
+  useEffect(() => {
+    if (!activeSprintId) {
+      const activeSprint = sprints.find(
+        ({ status }) => status === SprintStatus.InProgress
+      );
+
+      if (activeSprint) {
+        setActiveSprintId(activeSprint._id);
+      }
+    }
+  }, [sprints, activeSprintId]);
 
   const submitSprint = async (sprint: Sprint) => {
     if (!sprint._id) {
