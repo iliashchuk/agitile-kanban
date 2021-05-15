@@ -1,12 +1,14 @@
 import { ColorModeScript } from '@chakra-ui/react';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { createBrowserHistory, History } from 'history';
+
 import { App } from './App';
 import * as serviceWorker from './serviceWorker';
 
 declare global {
   interface Window {
-    renderKanban(containerId: string, history?: History): void;
+    renderKanban(containerId: string, history: History): void;
     unmountKanban(containerId: string): void;
   }
 }
@@ -31,7 +33,8 @@ window.unmountKanban = (containerId) => {
 };
 
 if (!document.getElementById('Kanban-container')) {
-  ReactDOM.render(<App />, document.getElementById('root'));
+  const history = createBrowserHistory();
+  ReactDOM.render(<App history={history} />, document.getElementById('root'));
 }
 
 // If you want your app to work offline and load faster, you can change

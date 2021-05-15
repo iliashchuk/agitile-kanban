@@ -4,7 +4,7 @@ import parseDate from 'date-fns/parseISO';
 import useFetch from 'use-http';
 
 import { Sprint, SprintStatus } from '../domain/Sprint';
-import { SprintParams } from '../domain/Router';
+import { PROJECT_PARAMS_PATH, SprintParams } from '../domain/Router';
 import { API_URL } from '../config';
 
 interface ISprintContext {
@@ -36,7 +36,9 @@ const setActiveSprintIdToStorage = (id?: string) => {
 };
 
 export const SprintProvider: React.FC = ({ children }) => {
-  const match = useRouteMatch<SprintParams>('/sprint/:id');
+  const match = useRouteMatch<SprintParams>(
+    `${PROJECT_PARAMS_PATH}/sprint/:id`
+  );
 
   const [activeSprintId, setLocalActiveSprintId] = useState(
     getActiveSprintIdFromStorage()

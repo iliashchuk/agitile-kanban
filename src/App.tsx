@@ -1,16 +1,19 @@
 import React, { FC } from 'react';
-import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom';
-import { ChakraProvider, Container, Grid, theme } from '@chakra-ui/react';
+import { BrowserRouter } from 'react-router-dom';
+import { ChakraProvider, theme } from '@chakra-ui/react';
 import { Provider as ApiProvider, CachePolicies } from 'use-http';
+import { History } from 'history';
 
-import { ColorModeSwitcher } from './ColorModeSwitcher';
-import { TicketFormProvider } from './components/TicketForm';
-import { SprintFormProvider } from './components/SprintForm';
-import { ControlPanel } from './components/ControlPanel';
-import { Backlog } from './components/Backlog';
+import {
+  SprintFormProvider,
+  TicketFormProvider,
+  MainRouter,
+  // ColorModeSwitcher
+} from './components';
 import { SprintProvider } from './context/SprintContext';
 import { TicketProvider } from './context/TicketContext';
 import { ControlProvider } from './context/ControlContext';
+import { ProjectProvider } from './context/ProjectContext';
 import { API_URL } from './config';
 
 const apiOptions = {
@@ -18,39 +21,27 @@ const apiOptions = {
 };
 
 interface Props {
-  history?: History;
+  history: History;
 }
 
-export const App: FC<Props> = () => {
+export const App: FC<Props> = ({ history }) => {
   return (
     <ChakraProvider theme={theme}>
       <ApiProvider url={API_URL} options={apiOptions}>
         <BrowserRouter>
-          <SprintProvider>
-            <TicketProvider>
-              <ControlProvider>
-                <TicketFormProvider>
-                  <SprintFormProvider>
-                    <Grid minH="100vh">
-                      <ColorModeSwitcher justifySelf="flex-end" />
-                      <Container textAlign="center" maxW="80vw" fontSize="xl">
-                        <ControlPanel />
-                        <Switch>
-                          <Route path="/sprint/:id">
-                            <Backlog />
-                          </Route>
-                          <Route path="/backlog">
-                            <Backlog />
-                          </Route>
-                          <Redirect to="/backlog" />
-                        </Switch>
-                      </Container>
-                    </Grid>
-                  </SprintFormProvider>
-                </TicketFormProvider>
-              </ControlProvider>
-            </TicketProvider>
-          </SprintProvider>
+          <ProjectProvider>
+            <SprintProvider>
+              <TicketProvider>
+                <ControlProvider>
+                  <TicketFormProvider>
+                    <SprintFormProvider>
+                      <MainRouter history={history} />
+                    </SprintFormProvider>
+                  </TicketFormProvider>
+                </ControlProvider>
+              </TicketProvider>
+            </SprintProvider>
+          </ProjectProvider>
         </BrowserRouter>
       </ApiProvider>
     </ChakraProvider>

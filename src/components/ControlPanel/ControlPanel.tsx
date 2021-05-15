@@ -13,17 +13,19 @@ import {
   Switch,
   Flex,
 } from '@chakra-ui/react';
-import { NavLink } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import { ReactComponent as SettingsIcon } from './settings.svg';
 
 import { SprintContext } from '../../context/SprintContext';
 import { ControlContext } from '../../context/ControlContext';
+import { ProjectContext } from '../../context/ProjectContext';
 
 interface Props {}
 
 export const ControlPanel: React.FC<Props> = () => {
   const { selectedSprint, sprints, activeSprintId } = useContext(SprintContext);
+  const { getProjectRelativePath } = useContext(ProjectContext);
   const { open: openSprintForm } = useContext(SprintFormContext);
   const { setIsBoardMode, isBoardMode } = useContext(ControlContext);
   const hasNoSprints = sprints.length === 0;
@@ -43,18 +45,18 @@ export const ControlPanel: React.FC<Props> = () => {
       );
     } else {
       activeSprintControl = (
-        <NavLink to={`/sprint/${activeSprintId}`}>
+        <Link to={getProjectRelativePath(`/sprint/${activeSprintId}`)}>
           <Button disabled={hasNoSprints}>Active sprint</Button>
-        </NavLink>
+        </Link>
       );
     }
   }
 
   return (
     <HStack mb="4">
-      <NavLink to="/backlog">
+      <Link to={getProjectRelativePath('/backlog')}>
         <Button>Backlog</Button>
-      </NavLink>
+      </Link>
       <ButtonGroup isAttached>
         <Menu>
           <MenuButton as={Button} disabled={hasNoSprints}>
@@ -64,13 +66,16 @@ export const ControlPanel: React.FC<Props> = () => {
           </MenuButton>
           <MenuList maxWidth="3xs">
             {sprints.map((sprint) => (
-              <NavLink key={sprint._id} to={`/sprint/${sprint._id}`}>
+              <Link
+                key={sprint._id}
+                to={getProjectRelativePath(`/sprint/${sprint._id}`)}
+              >
                 <MenuItem key={sprint._id}>
                   <Text isTruncated maxWidth="3xs">
                     {sprint.name}
                   </Text>
                 </MenuItem>
-              </NavLink>
+              </Link>
             ))}
           </MenuList>
         </Menu>
