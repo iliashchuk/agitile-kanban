@@ -21,6 +21,7 @@ type ProjectParameters = Pick<Project, 'owner' | 'repo'>;
 
 interface IProjectContext {
   project?: Project;
+  loading: boolean;
   projectMatchParams?: ProjectParameters;
   contributors: Contributor[];
   createProjectWithMatchParams(prefix: string): void;
@@ -39,10 +40,11 @@ export const ProjectProvider: React.FC = ({ children }) => {
   const [project, setProject] = useState<Project>();
   const projectMatchParams = projectMatch?.params;
 
-  const { get, post } = useFetch(`${API_URL}/project`);
+  const { get, post, loading } = useFetch(`${API_URL}/project`);
 
   useEffect(() => {
     if (projectMatchParams) {
+      setProject(undefined);
       const getProject = async () => {
         const project = await get(
           `?${querystring.stringify(projectMatchParams)}`
@@ -78,6 +80,7 @@ export const ProjectProvider: React.FC = ({ children }) => {
   return (
     <ProjectContext.Provider
       value={{
+        loading,
         project,
         projectMatchParams,
         contributors,

@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 import { Router } from 'react-router-dom';
-import { ChakraProvider, theme } from '@chakra-ui/react';
+import { ChakraProvider, Container, Grid, theme } from '@chakra-ui/react';
 import { Provider as ApiProvider, CachePolicies } from 'use-http';
 import { History } from 'history';
 
@@ -35,7 +35,12 @@ export const App: FC<Props> = ({ history }) => {
                 <ControlProvider>
                   <TicketFormProvider>
                     <SprintFormProvider>
-                      <MainRouter history={history} />
+                      <Grid width="70vw">
+                        {/* <ColorModeSwitcher justifySelf="flex-end" /> */}
+                        <Container textAlign="center" maxW="80vw" fontSize="xl">
+                          <MainRouter history={history} />
+                        </Container>
+                      </Grid>
                     </SprintFormProvider>
                   </TicketFormProvider>
                 </ControlProvider>

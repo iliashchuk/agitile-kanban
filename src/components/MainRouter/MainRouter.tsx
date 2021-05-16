@@ -1,4 +1,4 @@
-import { Container, Grid, Heading } from '@chakra-ui/react';
+import { Container, Grid, Heading, Spinner } from '@chakra-ui/react';
 import { History } from 'history';
 import React, { useContext } from 'react';
 import { Redirect, Route, Switch, useRouteMatch } from 'react-router-dom';
@@ -14,38 +14,47 @@ interface Props {
 }
 
 export const MainRouter: React.FC<Props> = ({ history }) => {
-  const { getProjectRelativePath, project, projectMatchParams } = useContext(
-    ProjectContext
-  );
+  const {
+    getProjectRelativePath,
+    project,
+    projectMatchParams,
+    loading,
+  } = useContext(ProjectContext);
 
-  return (
-    <Grid width="70vw">
-      {/* <ColorModeSwitcher justifySelf="flex-end" /> */}
-      <Container textAlign="center" maxW="80vw" fontSize="xl">
-        <Switch>
-          {projectMatchParams && (
-            <>
-              {!project && (
-                <Route path={PROJECT_PARAMS_PATH}>
-                  <ProjectForm />{' '}
-                </Route>
-              )}
-              <Route path={`${PROJECT_PARAMS_PATH}/sprint/:id`}>
-                <ControlPanel />
-                <Backlog />
-              </Route>
-              <Route path={`${PROJECT_PARAMS_PATH}/backlog`}>
-                <ControlPanel />
-                <Backlog />
-              </Route>
-              {project && <Redirect to={getProjectRelativePath('/backlog')} />}
-            </>
-          )}
-          <Route path="/">
-            <Heading>No project selected.</Heading>
-          </Route>
-        </Switch>
-      </Container>
-    </Grid>
+  const isRelevantProjectLoaded = () => {
+    if (project && projectMatchParams) {
+      return (
+        project.owner === projectMatchParams.owner &&
+        project.repo === projectMatchParams.repo
+      );
+    }
+  };
+
+  if (!projectMatchParams) {
+    return <Heading>No project selected.</Heading>;
+  }
+
+  if (loading) {
+    return <Spinner />;
+  }
+
+  return isRelevantProjectLoaded() ? (
+    <Switch>
+      <Route path={`${PROJECT_PARAMS_PATH}/sprint/:id`}>
+        <ControlPanel />
+        <Backlog />
+      </Route>
+      <Route path={`${PROJECT_PARAMS_PATH}/backlog`}>
+        <ControlPanel />
+        <Backlog />
+      </Route>
+      <Redirect to={getProjectRelativePath('/backlog')} />
+    </Switch>
+  ) : (
+    <Switch>
+      <Route path={PROJECT_PARAMS_PATH}>
+        <ProjectForm />
+      </Route>
+    </Switch>
   );
 };
