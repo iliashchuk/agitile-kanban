@@ -1,7 +1,7 @@
-import { Container, Grid, Heading, Spinner } from '@chakra-ui/react';
+import { Heading, Spinner } from '@chakra-ui/react';
 import { History } from 'history';
 import React, { useContext } from 'react';
-import { Redirect, Route, Switch, useRouteMatch } from 'react-router-dom';
+import { Redirect, Route, Switch } from 'react-router-dom';
 import { PROJECT_PARAMS_PATH } from '../../domain/Router';
 
 import { ControlPanel } from '../ControlPanel';

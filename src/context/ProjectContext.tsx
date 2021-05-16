@@ -5,7 +5,7 @@ import querystring from 'querystring';
 
 import { PROJECT_PARAMS_PATH } from '../domain/Router';
 
-import { generatePath, useRouteMatch } from 'react-router-dom';
+import { generatePath, useHistory, useRouteMatch } from 'react-router-dom';
 import { Contributor } from '../domain/Project';
 import { API_URL } from '../config';
 import useFetch from 'use-http';
@@ -35,25 +35,53 @@ export const ProjectContext = createContext<IProjectContext>(
 const octokit = new Octokit();
 
 export const ProjectProvider: React.FC = ({ children }) => {
+  const history = useHistory();
   const projectMatch = useRouteMatch<ProjectParameters>(PROJECT_PARAMS_PATH);
-  const [contributors] = useState<Contributor[]>([]);
+  const [contributors, setContributors] = useState<Contributor[]>([]);
   const [project, setProject] = useState<Project>();
   const projectMatchParams = projectMatch?.params;
 
   const { get, post, loading } = useFetch(`${API_URL}/project`);
 
+  const getContributors = async (
+    projectParams: ProjectParameters
+  ): Promise<Contributor[] | undefined> => {
+    try {
+      const { data } = await octokit.rest.repos.listContributors({
+        ...projectParams,
+      });
+
+      return data;
+    } catch (e) {
+      if (e.code === 404) {
+        history.push('/');
+      }
+    }
+  };
+
+  const dispatchProjectEvent = (project: ProjectParameters) => {
+    const projectEvent = new CustomEvent('project-ready', {
+      detail: project,
+    });
+    window.dispatchEvent(projectEvent);
+  };
+
   useEffect(() => {
     if (projectMatchParams) {
-      setProject(undefined);
-      const getProject = async () => {
-        const project = await get(
-          `?${querystring.stringify(projectMatchParams)}`
-        );
-        if (project) {
-          setProject(project as Project);
+      const fetchAndSetProject = async () => {
+        const contributors = await getContributors(projectMatchParams);
+        if (contributors) {
+          const project = await get(
+            `?${querystring.stringify(projectMatchParams)}`
+          );
+          if (project) {
+            setProject(project);
+            dispatchProjectEvent(project);
+            setContributors(contributors);
+          }
         }
       };
-      getProject();
+      fetchAndSetProject();
     }
   }, [projectMatchParams?.owner, projectMatchParams?.repo, get]);
 
@@ -70,10 +98,20 @@ export const ProjectProvider: React.FC = ({ children }) => {
   const createProjectWithMatchParams: IProjectContext['createProjectWithMatchParams'] = async (
     prefix
   ) => {
-    const project = await post({ ...projectMatchParams, prefix });
+    if (!projectMatchParams) {
+      return;
+    }
 
-    if (project) {
-      setProject(project);
+    const contributors = await getContributors(projectMatchParams);
+
+    if (contributors) {
+      const project = await post({ ...projectMatchParams, prefix });
+
+      if (project) {
+        setProject(project);
+        dispatchProjectEvent(project);
+        setContributors(contributors);
+      }
     }
   };
 

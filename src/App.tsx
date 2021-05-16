@@ -35,12 +35,18 @@ export const App: FC<Props> = ({ history }) => {
                 <ControlProvider>
                   <TicketFormProvider>
                     <SprintFormProvider>
-                      <Grid width="70vw">
-                        {/* <ColorModeSwitcher justifySelf="flex-end" /> */}
-                        <Container textAlign="center" maxW="80vw" fontSize="xl">
-                          <MainRouter history={history} />
-                        </Container>
-                      </Grid>
+                      {/* <ColorModeSwitcher justifySelf="flex-end" /> */}
+                      <Container
+                        p={4}
+                        textAlign="center"
+                        maxW="100%"
+                        maxH="100%"
+                        w="100%"
+                        h="100%"
+                        fontSize="xl"
+                      >
+                        <MainRouter history={history} />
+                      </Container>
                     </SprintFormProvider>
                   </TicketFormProvider>
                 </ControlProvider>
