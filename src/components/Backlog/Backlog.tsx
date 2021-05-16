@@ -58,7 +58,7 @@ export const Backlog: React.FC = () => {
                 {ticket.name}
               </Text>
               <Spacer />
-              <Badge fontSize="large">{ticket._id}</Badge>
+              <Badge fontSize="large">{ticket.displayId}</Badge>
             </HStack>
           ))
         ) : (

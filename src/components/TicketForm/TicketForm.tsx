@@ -16,7 +16,7 @@ import {
 
 import { SubtaskList } from '../SubtaskList/SubtaskList';
 import { TicketType, Ticket, TicketStatus } from '../../domain/Ticket';
-import { TicketContext } from '../../context/TicketContext';
+import { ProjectContext } from '../../context/ProjectContext';
 
 interface Props {
   ticket?: Ticket;
@@ -24,7 +24,7 @@ interface Props {
   onSubmit: (ticket: Ticket) => void;
 }
 
-const defaultTicket: Omit<Ticket, '_id'> = {
+const defaultTicket: Omit<Ticket, '_id' | 'owner' | 'repo' | 'displayId'> = {
   name: '',
   subtasks: [],
   type: TicketType.Task,
@@ -32,7 +32,11 @@ const defaultTicket: Omit<Ticket, '_id'> = {
 };
 
 export const TicketForm: React.FC<Props> = ({ ticket, onSubmit, onCancel }) => {
-  const { idPrefix } = useContext(TicketContext);
+  const { project } = useContext(ProjectContext);
+
+  if (!project) {
+    return null;
+  }
 
   const TypeSelect = (
     <Field name="type">
@@ -72,7 +76,9 @@ export const TicketForm: React.FC<Props> = ({ ticket, onSubmit, onCancel }) => {
               name="name"
               render={({ input, meta: { error, submitFailed } }) => (
                 <InputGroup size="lg">
-                  <InputLeftAddon>{values._id ?? idPrefix}</InputLeftAddon>
+                  <InputLeftAddon>
+                    {values.displayId ?? project.prefix}
+                  </InputLeftAddon>
                   <Input
                     isInvalid={submitFailed && error}
                     placeholder="Ticket Name"

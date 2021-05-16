@@ -1,11 +1,19 @@
-import React, { createContext, useEffect, useState } from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import { useRouteMatch } from 'react-router-dom';
 import parseDate from 'date-fns/parseISO';
 import useFetch from 'use-http';
+import querystring from 'querystring';
 
 import { Sprint, SprintStatus } from '../domain/Sprint';
 import { PROJECT_PARAMS_PATH, SprintParams } from '../domain/Router';
 import { API_URL } from '../config';
+import { ProjectContext } from './ProjectContext';
 
 interface ISprintContext {
   sprints: Sprint[];
@@ -36,21 +44,38 @@ const setActiveSprintIdToStorage = (id?: string) => {
 };
 
 export const SprintProvider: React.FC = ({ children }) => {
-  const match = useRouteMatch<SprintParams>(
+  const { project } = useContext(ProjectContext);
+  const sprintMatch = useRouteMatch<SprintParams>(
     `${PROJECT_PARAMS_PATH}/sprint/:id`
   );
 
+  const [sprints, setSprints] = useState<ResponseSprint[]>([]);
   const [activeSprintId, setLocalActiveSprintId] = useState(
     getActiveSprintIdFromStorage()
   );
 
-  const { post, put, data: updatedData } = useFetch<Sprint>(
-    `${API_URL}/sprint`
+  const { get, loading: sprintsLoading } = useFetch<ResponseSprint[]>(
+    `${API_URL}/sprints`
   );
+  const { post, put } = useFetch<Sprint>(`${API_URL}/sprint`);
 
-  const { data: sprints = [], loading: sprintsLoading } = useFetch<
-    ResponseSprint[]
-  >(`${API_URL}/sprints`, {}, [updatedData]);
+  const fetchAndSetSprints = useCallback(async () => {
+    if (project) {
+      const { owner, repo } = project;
+      const response = await get(`?${querystring.stringify({ owner, repo })}`);
+
+      setSprints(response);
+    }
+  }, [project, get]);
+
+  const setActiveSprintId = (id?: string) => {
+    setActiveSprintIdToStorage(id);
+    setLocalActiveSprintId(id);
+  };
+
+  useEffect(() => {
+    fetchAndSetSprints();
+  }, [fetchAndSetSprints, project]);
 
   useEffect(() => {
     if (!activeSprintId) {
@@ -60,46 +85,72 @@ export const SprintProvider: React.FC = ({ children }) => {
 
       if (activeSprint) {
         setActiveSprintId(activeSprint._id);
+      } else {
+        setActiveSprintId(undefined);
       }
     }
   }, [sprints, activeSprintId]);
 
-  const submitSprint = async (sprint: Sprint) => {
-    if (!sprint._id) {
-      await post(sprint);
-      return;
+  useEffect(() => {
+    if (activeSprintId) {
+      const sprintInProgress = sprints.find(
+        ({ status }) => status === SprintStatus.InProgress
+      );
+
+      if (!sprintInProgress || activeSprintId !== sprintInProgress._id) {
+        setActiveSprintId(sprintInProgress?._id);
+      }
     }
-    await put(sprint);
+  }, [activeSprintId, sprints]);
+
+  const updateAndRefetchSprint = async (ticket: Partial<Sprint>) => {
+    await put(ticket);
+    fetchAndSetSprints();
   };
 
-  const setActiveSprintId = (id?: string) => {
-    setActiveSprintIdToStorage(id);
-    setLocalActiveSprintId(id);
+  const submitSprint = async (sprint: Sprint) => {
+    if (project) {
+      const { owner, repo } = project;
+
+      if (!sprint._id) {
+        await post({ ...sprint, owner, repo });
+        fetchAndSetSprints();
+      }
+      await updateAndRefetchSprint(sprint);
+    }
   };
 
-  const selectedSprint = sprints.find(({ _id: id }) => id === match?.params.id);
+  const selectedSprint = sprints.find(
+    ({ _id: id }) => id === sprintMatch?.params.id
+  );
 
-  const startSprint: ISprintContext['startSprint'] = (sprintId) => {
-    if (sprintId && activeSprintId) {
+  const startSprint: ISprintContext['startSprint'] = async (sprintId) => {
+    if (activeSprintId) {
       // add logs
       return;
     }
-    setActiveSprintId(sprintId);
     if (sprintId) {
-      put({ _id: sprintId, status: SprintStatus.InProgress });
+      await updateAndRefetchSprint({
+        _id: sprintId,
+        status: SprintStatus.InProgress,
+      });
+      setActiveSprintId(sprintId);
     }
   };
 
-  const finishSprint: ISprintContext['finishSprint'] = (sprintId) => {
+  const finishSprint: ISprintContext['finishSprint'] = async (sprintId) => {
+    await updateAndRefetchSprint({
+      _id: sprintId,
+      status: SprintStatus.Finished,
+    });
     setActiveSprintId(undefined);
-    put({ _id: sprintId, status: SprintStatus.Finished });
   };
 
   const addTicketToSprint: ISprintContext['addTicketToSprint'] = (
     sprintId,
     ticketId
   ) => {
-    put({
+    updateAndRefetchSprint({
       _id: sprintId,
       tickets: [
         ...(sprints.find(({ _id }) => _id === sprintId)?.tickets ?? []),

@@ -1,13 +1,20 @@
-import React, { createContext } from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import useFetch from 'use-http';
-import { API_URL } from '../config';
+import querystring from 'querystring';
 
+import { API_URL } from '../config';
 import { Ticket, TicketStatus } from '../domain/Ticket';
+import { ProjectContext } from './ProjectContext';
 
 interface ITicketContext {
   tickets: Ticket[];
   ticketsLoading: boolean;
-  idPrefix: string;
   completeSubtask(ticketId: string, subtaskId: string): void;
   submitTicket(ticket: Ticket): void;
   changeTicketState(ticketId: string, status: TicketStatus): void;
@@ -18,26 +25,42 @@ export const TicketContext = createContext<ITicketContext>(
 );
 
 export const TicketProvider: React.FC = ({ children }) => {
-  const { post, put, data: updatedData } = useFetch(`${API_URL}/ticket`);
+  const { project } = useContext(ProjectContext);
+  const [tickets, setTickets] = useState<Ticket[]>([]);
+  const { post, put } = useFetch(`${API_URL}/ticket`);
 
-  const { data: tickets = [], loading: ticketsLoading } = useFetch<Ticket[]>(
-    `${API_URL}/tickets`,
-    {},
-    [updatedData]
+  const { loading: ticketsLoading, get } = useFetch<Ticket[]>(
+    `${API_URL}/tickets`
   );
 
-  const { data: idPrefix = '' } = useFetch<string>(
-    `${API_URL}/id-prefix`,
-    {},
-    []
-  );
+  const fetchAndSetTickets = useCallback(async () => {
+    if (project) {
+      const { owner, repo } = project;
+      const response = await get(`?${querystring.stringify({ owner, repo })}`);
+
+      setTickets(response);
+    }
+  }, [project, get]);
+
+  const updateAndRefetchTicket = async (ticket: Partial<Ticket>) => {
+    await put(ticket);
+    fetchAndSetTickets();
+  };
+
+  useEffect(() => {
+    fetchAndSetTickets();
+  }, [fetchAndSetTickets, project]);
 
   const submitTicket = async (ticket: Ticket) => {
-    if (!ticket._id) {
-      await post(ticket);
-      return;
+    if (project) {
+      const { owner, repo } = project;
+      if (!ticket._id) {
+        await post({ ...ticket, owner, repo });
+        fetchAndSetTickets();
+        return;
+      }
+      await updateAndRefetchTicket(ticket);
     }
-    await put(ticket);
   };
 
   const completeSubtask: ITicketContext['completeSubtask'] = async (
@@ -63,7 +86,7 @@ export const TicketProvider: React.FC = ({ children }) => {
     ticketId,
     status
   ) => {
-    put({ _id: ticketId, status });
+    updateAndRefetchTicket({ _id: ticketId, status });
   };
 
   return (
@@ -72,7 +95,6 @@ export const TicketProvider: React.FC = ({ children }) => {
         tickets,
         completeSubtask,
         ticketsLoading,
-        idPrefix,
         submitTicket,
         changeTicketState,
       }}

@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { BrowserRouter } from 'react-router-dom';
+import { Router } from 'react-router-dom';
 import { ChakraProvider, theme } from '@chakra-ui/react';
 import { Provider as ApiProvider, CachePolicies } from 'use-http';
 import { History } from 'history';
@@ -28,7 +28,7 @@ export const App: FC<Props> = ({ history }) => {
   return (
     <ChakraProvider theme={theme}>
       <ApiProvider url={API_URL} options={apiOptions}>
-        <BrowserRouter>
+        <Router history={history}>
           <ProjectProvider>
             <SprintProvider>
               <TicketProvider>
@@ -42,7 +42,7 @@ export const App: FC<Props> = ({ history }) => {
               </TicketProvider>
             </SprintProvider>
           </ProjectProvider>
-        </BrowserRouter>
+        </Router>
       </ApiProvider>
     </ChakraProvider>
   );

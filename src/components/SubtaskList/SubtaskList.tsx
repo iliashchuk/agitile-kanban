@@ -11,6 +11,7 @@ import {
 
 import { Subtask } from '../../domain/Ticket';
 import { TicketContext } from '../../context/TicketContext';
+import { ProjectContext } from '../../context/ProjectContext';
 
 interface Props {
   subtasks: Subtask[];
@@ -23,9 +24,14 @@ export const SubtaskList: React.FC<Props> = ({
   onChange,
   ticketId,
 }) => {
-  const { idPrefix, completeSubtask } = useContext(TicketContext);
+  const { completeSubtask } = useContext(TicketContext);
+  const { project } = useContext(ProjectContext);
   const [newSubtaskName, setNewSubtaskName] = useState('');
   const isReadonly = !onChange;
+
+  if (!project) {
+    return null;
+  }
 
   const onEdit = (subtask: Subtask) => {
     if (!onChange) {
@@ -58,7 +64,7 @@ export const SubtaskList: React.FC<Props> = ({
     <Stack spacing="2" onClick={(e) => e.stopPropagation()} cursor="default">
       {subtasks.map((subtask) => (
         <InputGroup size="sm" key={subtask._id}>
-          <InputLeftAddon>{subtask._id ?? idPrefix}</InputLeftAddon>
+          <InputLeftAddon>{subtask.displayId ?? project.prefix}</InputLeftAddon>
           <Input
             // disabled={isReadonly}
             value={subtask.name}

@@ -3,7 +3,7 @@ export * from './Board';
 export * from './ColorModeSwitcher';
 export * from './ControlPanel';
 export * from './MainRouter';
-export * from './ProjectSelect';
+export * from './ProjectForm';
 export * from './SprintForm';
 export * from './SubtaskList';
 export * from './TicketForm';

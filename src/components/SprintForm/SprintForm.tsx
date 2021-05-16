@@ -36,7 +36,7 @@ export interface SprintFormProps {
   onCancel(): void;
 }
 
-const defaultSprint: Omit<Sprint, '_id'> = {
+const defaultSprint: Omit<Sprint, '_id' | 'owner' | 'repo'> = {
   name: '',
   startDate: new Date(),
   endDate: new Date(),
@@ -184,36 +184,39 @@ export const SprintForm: React.FC<SprintFormProps> = ({
                 {({ input }) => (
                   <Box>
                     <Wrap justify={input.value.length ? 'start' : 'center'}>
-                      <Menu>
-                        <MenuButton size="sm" variant="outline" as={Button}>
-                          Add tickets
-                        </MenuButton>
-                        <MenuList>
-                          {tickets
-                            .filter(({ _id: id }) => !input.value.includes(id))
-                            .map(({ _id: ticketId }) => (
-                              <MenuItem
-                                key={ticketId}
-                                onClick={() => {
-                                  input.onChange([...input.value, ticketId]);
-                                }}
-                              >
-                                {ticketId}:&nbsp;
-                                {
-                                  tickets.find(({ _id: id }) => ticketId === id)
-                                    ?.name
-                                }
-                              </MenuItem>
-                            ))}
-                        </MenuList>
-                      </Menu>
+                      {tickets.length > 0 ? (
+                        <Menu>
+                          <MenuButton size="sm" variant="outline" as={Button}>
+                            Add tickets
+                          </MenuButton>
+                          <MenuList>
+                            {tickets
+                              .filter(({ _id }) => !input.value.includes(_id))
+                              .map(({ displayId, _id, name }) => (
+                                <MenuItem
+                                  key={_id}
+                                  onClick={() => {
+                                    input.onChange([...input.value, _id]);
+                                  }}
+                                >
+                                  {displayId}:&nbsp;{name}
+                                </MenuItem>
+                              ))}
+                          </MenuList>
+                        </Menu>
+                      ) : (
+                        <Text>Create tickets to add to the sprint.</Text>
+                      )}
                       {input.value.map((ticketId) => (
                         <Tag key={ticketId}>
-                          {ticketId}
+                          {
+                            tickets.find(({ _id }) => _id === ticketId)
+                              ?.displayId
+                          }
                           <TagCloseButton
                             onClick={() =>
                               input.onChange(
-                                input.value.filter((id) => id !== ticketId)
+                                input.value.filter((_id) => _id !== ticketId)
                               )
                             }
                           />

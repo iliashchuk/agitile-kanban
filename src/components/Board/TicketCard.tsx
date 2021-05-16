@@ -11,6 +11,7 @@ interface Props extends Ticket {}
 
 export const TicketCard: React.FC<Props> = ({
   _id,
+  displayId,
   name,
   type,
   assignee,
@@ -39,7 +40,7 @@ export const TicketCard: React.FC<Props> = ({
       opacity={isDragging ? 0.5 : 1}
     >
       <Flex alignItems="center" justifyContent="space-between">
-        <TypeIcon type={type} label={_id} />
+        <TypeIcon type={type} label={displayId} />
         <Text>{assignee}</Text>
       </Flex>
       <Text fontSize="large">&nbsp;{name}</Text>

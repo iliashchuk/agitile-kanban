@@ -11,4 +11,6 @@ export type Sprint = {
   endDate: Date;
   status: SprintStatus;
   tickets: string[];
+  owner: string;
+  repo: string;
 };
