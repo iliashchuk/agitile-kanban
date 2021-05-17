@@ -2,10 +2,11 @@ import React, { useContext } from 'react';
 import { Stack, Flex, Text } from '@chakra-ui/react';
 import { useDrag } from 'react-dnd';
 
-import { Ticket, TicketDNDTypes } from '../../domain/Ticket';
+import { Ticket, TicketDNDTypes, TicketStatus } from '../../domain/Ticket';
 import { TypeIcon } from '../TypeIcon';
 import { SubtaskList } from '../SubtaskList';
 import { TicketFormContext } from '../TicketForm';
+import { AssigneeAvatar } from '../AssigneeAvatar';
 
 interface Props extends Ticket {}
 
@@ -19,6 +20,7 @@ export const TicketCard: React.FC<Props> = ({
   subtasks,
 }) => {
   const { open } = useContext(TicketFormContext);
+  const isDone = status === TicketStatus.Done;
 
   const [{ isDragging }, drag] = useDrag(() => ({
     type: TicketDNDTypes.TICKET,
@@ -26,6 +28,7 @@ export const TicketCard: React.FC<Props> = ({
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
+    canDrag: !isDone,
   }));
 
   return (
@@ -34,16 +37,22 @@ export const TicketCard: React.FC<Props> = ({
       padding="3"
       spacing="1"
       bg="white"
-      cursor="pointer"
+      cursor={isDone ? 'pointer' : 'grab'}
       borderRadius="lg"
       onClick={() => open({ ticketId: _id })}
       opacity={isDragging ? 0.5 : 1}
     >
-      <Flex alignItems="center" justifyContent="space-between">
+      <Flex alignItems="center" justifyContent="space-between" mb={2}>
         <TypeIcon type={type} label={displayId} />
-        <Text>{assignee}</Text>
+        <AssigneeAvatar ml={2} size="xs" assigneeName={assignee} />
       </Flex>
-      <Text fontSize="large">&nbsp;{name}</Text>
+      <Text
+        isTruncated
+        textDecoration={isDone ? 'line-through' : 'none'}
+        fontSize="large"
+      >
+        {name}
+      </Text>
       {subtasks && !!subtasks.length && (
         <SubtaskList ticketId={_id} subtasks={subtasks}></SubtaskList>
       )}

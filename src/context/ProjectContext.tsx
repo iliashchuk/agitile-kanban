@@ -2,22 +2,13 @@ import React, { createContext, useEffect, useState } from 'react';
 import { LocationDescriptor } from 'history';
 import { Octokit } from '@octokit/rest';
 import querystring from 'querystring';
-
-import { PROJECT_PARAMS_PATH } from '../domain/Router';
-
 import { generatePath, useHistory, useRouteMatch } from 'react-router-dom';
-import { Contributor } from '../domain/Project';
-import { API_URL } from '../config';
 import useFetch from 'use-http';
 
-export interface Project {
-  owner: string;
-  repo: string;
-  prefix: string;
-  seq: number;
-}
-
-type ProjectParameters = Pick<Project, 'owner' | 'repo'>;
+import { PROJECT_PARAMS_PATH } from '../domain/Router';
+import { Contributor, Project, ProjectParameters } from '../domain/Project';
+import { API_URL } from '../config';
+import { dispatchProjectEvent } from '../communication/events';
 
 interface IProjectContext {
   project?: Project;
@@ -57,13 +48,6 @@ export const ProjectProvider: React.FC = ({ children }) => {
         history.push('/');
       }
     }
-  };
-
-  const dispatchProjectEvent = (project: ProjectParameters) => {
-    const projectEvent = new CustomEvent('project-ready', {
-      detail: project,
-    });
-    window.dispatchEvent(projectEvent);
   };
 
   useEffect(() => {

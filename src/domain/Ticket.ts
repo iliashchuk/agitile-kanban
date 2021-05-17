@@ -34,6 +34,7 @@ export type Ticket = {
   description?: string;
   subtasks?: Subtask[];
   assignee?: string;
+  storyPoints: number;
   owner: string;
   repo: string;
 };

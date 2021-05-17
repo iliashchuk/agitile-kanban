@@ -66,8 +66,8 @@ export const TicketFormProvider: React.FC = ({ children }) => {
     onClose();
   };
 
-  const onSubmit = (ticket: Ticket) => {
-    submitTicket(ticket);
+  const onSubmit = async (ticket: Ticket) => {
+    ticket = await submitTicket(ticket);
     if (parentSprintId) {
       addTicketToSprint(parentSprintId, ticket._id);
     }

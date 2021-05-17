@@ -12,11 +12,19 @@ import {
   Textarea,
   Box,
   Button,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  Flex,
+  Avatar,
+  CloseButton,
 } from '@chakra-ui/react';
 
 import { SubtaskList } from '../SubtaskList/SubtaskList';
 import { TicketType, Ticket, TicketStatus } from '../../domain/Ticket';
 import { ProjectContext } from '../../context/ProjectContext';
+import { StoryPointRadioGroup } from './StoryPointRadioGroup';
 
 interface Props {
   ticket?: Ticket;
@@ -27,12 +35,13 @@ interface Props {
 const defaultTicket: Omit<Ticket, '_id' | 'owner' | 'repo' | 'displayId'> = {
   name: '',
   subtasks: [],
+  storyPoints: 1,
   type: TicketType.Task,
   status: TicketStatus.ToDo,
 };
 
 export const TicketForm: React.FC<Props> = ({ ticket, onSubmit, onCancel }) => {
-  const { project } = useContext(ProjectContext);
+  const { project, contributors } = useContext(ProjectContext);
 
   if (!project) {
     return null;
@@ -93,12 +102,47 @@ export const TicketForm: React.FC<Props> = ({ ticket, onSubmit, onCancel }) => {
 
             <Field name="assignee">
               {({ input }) => (
-                <InputGroup alignItems="center">
+                <Flex alignItems="center">
                   <Text fontSize="md" mr="2">
                     Assignee:
                   </Text>
-                  <Input {...input} />
-                </InputGroup>
+                  <Menu matchWidth>
+                    <MenuButton textDecoration="underline">
+                      {input.value || 'select a contributor'}
+                    </MenuButton>
+                    <MenuList>
+                      {contributors.map(({ id, login, avatar_url }) => (
+                        <MenuItem
+                          onClick={() => input.onChange(login)}
+                          key={id}
+                        >
+                          <Text mr={2}>{login}</Text>
+                          <Avatar src={avatar_url} name={login} size="sm" />
+                        </MenuItem>
+                      ))}
+                    </MenuList>
+                  </Menu>
+                  {input.value && (
+                    <CloseButton
+                      ml={2}
+                      size="sm"
+                      onClick={() => {
+                        input.onChange(undefined);
+                      }}
+                    />
+                  )}
+                </Flex>
+              )}
+            </Field>
+
+            {/* storyPoints */}
+
+            <Field name="storyPoints">
+              {({ input }) => (
+                <Flex align="center">
+                  <Text mr={4}>Story points:</Text>
+                  <StoryPointRadioGroup {...input} />
+                </Flex>
               )}
             </Field>
 

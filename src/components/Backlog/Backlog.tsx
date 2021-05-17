@@ -7,6 +7,8 @@ import {
   Button,
   Box,
   Stack,
+  Avatar,
+  Tooltip,
 } from '@chakra-ui/react';
 
 import { TypeIcon } from '../TypeIcon';
@@ -17,6 +19,7 @@ import { SprintContext } from '../../context/SprintContext';
 import { SprintStatus } from '../../domain/Sprint';
 import { Board } from '../Board';
 import { ControlContext } from '../../context/ControlContext';
+import { AssigneeAvatar } from '../AssigneeAvatar';
 
 export const Backlog: React.FC = () => {
   const { tickets } = useContext(TicketContext);
@@ -36,7 +39,7 @@ export const Backlog: React.FC = () => {
   }
 
   return (
-    <Stack height="md" maxHeight="md">
+    <Stack height="100%">
       <Box mb="4" overflowY="auto">
         {displayedTickets.length ? (
           displayedTickets.map((ticket, index) => (
@@ -58,6 +61,7 @@ export const Backlog: React.FC = () => {
                 {ticket.name}
               </Text>
               <Spacer />
+              <AssigneeAvatar size="sm" mr={2} assigneeName={ticket.assignee} />
               <Badge fontSize="large">{ticket.displayId}</Badge>
             </HStack>
           ))

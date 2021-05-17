@@ -16,7 +16,7 @@ interface ITicketContext {
   tickets: Ticket[];
   ticketsLoading: boolean;
   completeSubtask(ticketId: string, subtaskId: string): void;
-  submitTicket(ticket: Ticket): void;
+  submitTicket(ticket: Ticket): Promise<Ticket>;
   changeTicketState(ticketId: string, status: TicketStatus): void;
 }
 
@@ -55,12 +55,13 @@ export const TicketProvider: React.FC = ({ children }) => {
     if (project) {
       const { owner, repo } = project;
       if (!ticket._id) {
-        await post({ ...ticket, owner, repo });
+        ticket = await post({ ...ticket, owner, repo });
         fetchAndSetTickets();
-        return;
+        return ticket;
       }
       await updateAndRefetchTicket(ticket);
     }
+    return ticket;
   };
 
   const completeSubtask: ITicketContext['completeSubtask'] = async (

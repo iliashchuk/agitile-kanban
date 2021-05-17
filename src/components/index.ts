@@ -1,3 +1,4 @@
+export * from './AssigneeAvatar';
 export * from './Backlog';
 export * from './Board';
 export * from './ColorModeSwitcher';

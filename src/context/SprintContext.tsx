@@ -14,6 +14,7 @@ import { Sprint, SprintStatus } from '../domain/Sprint';
 import { PROJECT_PARAMS_PATH, SprintParams } from '../domain/Router';
 import { API_URL } from '../config';
 import { ProjectContext } from './ProjectContext';
+import { dispatchSprintEvent } from '../communication/events';
 
 interface ISprintContext {
   sprints: Sprint[];
@@ -73,6 +74,16 @@ export const SprintProvider: React.FC = ({ children }) => {
     setLocalActiveSprintId(id);
   };
 
+  const selectedSprint = sprints.find(
+    ({ _id: id }) => id === sprintMatch?.params.id
+  );
+
+  useEffect(() => {
+    if (sprintMatch) {
+      dispatchSprintEvent();
+    }
+  }, [sprintMatch?.params.id]);
+
   useEffect(() => {
     fetchAndSetSprints();
   }, [fetchAndSetSprints, project]);
@@ -119,10 +130,6 @@ export const SprintProvider: React.FC = ({ children }) => {
       await updateAndRefetchSprint(sprint);
     }
   };
-
-  const selectedSprint = sprints.find(
-    ({ _id: id }) => id === sprintMatch?.params.id
-  );
 
   const startSprint: ISprintContext['startSprint'] = async (sprintId) => {
     if (activeSprintId) {

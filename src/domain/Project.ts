@@ -8,3 +8,12 @@ export interface Contributor {
   login?: string;
   avatar_url?: string;
 }
+
+export interface Project {
+  owner: string;
+  repo: string;
+  prefix: string;
+  seq: number;
+}
+
+export type ProjectParameters = Pick<Project, 'owner' | 'repo'>;
