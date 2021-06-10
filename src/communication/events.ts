@@ -1,9 +1,5 @@
-import { ProjectParameters } from '../domain/Project';
-
-export const dispatchProjectEvent = (project: ProjectParameters) => {
-  const projectEvent = new CustomEvent('project-ready', {
-    detail: project,
-  });
+export const dispatchTaskDoneEvent = () => {
+  const projectEvent = new CustomEvent('task-done');
   window.dispatchEvent(projectEvent);
 };
 

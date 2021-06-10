@@ -3,6 +3,7 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useRef,
   useState,
 } from 'react';
 import useFetch from 'use-http';
@@ -11,6 +12,7 @@ import querystring from 'querystring';
 import { API_URL } from '../config';
 import { Ticket, TicketStatus } from '../domain/Ticket';
 import { ProjectContext } from './ProjectContext';
+import { dispatchTaskDoneEvent } from '../communication/events';
 
 interface ITicketContext {
   tickets: Ticket[];
@@ -26,7 +28,12 @@ export const TicketContext = createContext<ITicketContext>(
 
 export const TicketProvider: React.FC = ({ children }) => {
   const { project } = useContext(ProjectContext);
-  const [tickets, setTickets] = useState<Ticket[]>([]);
+  const [tickets, _setTickets] = useState<Ticket[]>([]);
+  const ticketsRef = useRef<Ticket[]>(tickets);
+  const setTickets = (_tickets: Ticket[]) => {
+    ticketsRef.current = _tickets;
+    _setTickets(_tickets);
+  };
   const { post, put } = useFetch(`${API_URL}/ticket`);
 
   const { loading: ticketsLoading, get } = useFetch<Ticket[]>(
@@ -42,10 +49,55 @@ export const TicketProvider: React.FC = ({ children }) => {
     }
   }, [project, get]);
 
-  const updateAndRefetchTicket = async (ticket: Partial<Ticket>) => {
-    await put(ticket);
-    fetchAndSetTickets();
-  };
+  const updateAndRefetchTicket = useCallback(
+    async (ticket: Partial<Ticket>) => {
+      await put(ticket);
+      fetchAndSetTickets();
+    },
+    [fetchAndSetTickets, put]
+  );
+
+  const changeTicketState: ITicketContext['changeTicketState'] = useCallback(
+    async (ticketId, status) => {
+      try {
+        await updateAndRefetchTicket({ _id: ticketId, status });
+      } catch (e) {
+        console.log('Failed to change ticket status', e);
+      }
+      dispatchTaskDoneEvent();
+    },
+    [updateAndRefetchTicket]
+  );
+
+  useEffect(() => {
+    function handleMergeEvent({
+      detail: branches,
+    }: Event & { detail: string[] }) {
+      console.log(branches);
+      for (const branch of branches) {
+        console.log(ticketsRef, ticketsRef.current);
+        const branchTicket = ticketsRef.current.find(({ displayId }) => {
+          console.log(branch, ticketsRef);
+          return branch.includes(displayId);
+        });
+
+        if (branchTicket) {
+          changeTicketState(branchTicket._id, TicketStatus.Review);
+        }
+      }
+    }
+    window.addEventListener(
+      'merge',
+      (handleMergeEvent as unknown) as EventListener
+    );
+
+    return () => {
+      window.removeEventListener(
+        'merge',
+        (handleMergeEvent as unknown) as EventListener
+      );
+    };
+  }, []);
 
   useEffect(() => {
     fetchAndSetTickets();
@@ -81,13 +133,6 @@ export const TicketProvider: React.FC = ({ children }) => {
     });
 
     submitTicket(ticket);
-  };
-
-  const changeTicketState: ITicketContext['changeTicketState'] = (
-    ticketId,
-    status
-  ) => {
-    updateAndRefetchTicket({ _id: ticketId, status });
   };
 
   return (
