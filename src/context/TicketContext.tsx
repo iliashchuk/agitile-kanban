@@ -30,11 +30,12 @@ export const TicketProvider: React.FC = ({ children }) => {
   const { project } = useContext(ProjectContext);
   const [tickets, _setTickets] = useState<Ticket[]>([]);
   const ticketsRef = useRef<Ticket[]>(tickets);
+  const { post, put } = useFetch(`${API_URL}/ticket`);
+
   const setTickets = (_tickets: Ticket[]) => {
     ticketsRef.current = _tickets;
     _setTickets(_tickets);
   };
-  const { post, put } = useFetch(`${API_URL}/ticket`);
 
   const { loading: ticketsLoading, get } = useFetch<Ticket[]>(
     `${API_URL}/tickets`
