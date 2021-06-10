@@ -80,7 +80,6 @@ export const TicketProvider: React.FC = ({ children }) => {
     function handleMergeEvent({
       detail: branches,
     }: Event & { detail: string[] }) {
-      console.log(branches);
       for (const branch of branches) {
         console.log(ticketsRef, ticketsRef.current);
         const branchTicket = ticketsRef.current.find(({ displayId }) => {
@@ -88,7 +87,7 @@ export const TicketProvider: React.FC = ({ children }) => {
           return branch.includes(displayId);
         });
 
-        if (branchTicket) {
+        if (branchTicket && branchTicket.status !== TicketStatus.Done) {
           changeTicketStatusRef.current(branchTicket._id, TicketStatus.Review);
         }
       }
