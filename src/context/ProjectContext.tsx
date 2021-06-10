@@ -8,7 +8,6 @@ import useFetch from 'use-http';
 import { PROJECT_PARAMS_PATH } from '../domain/Router';
 import { Contributor, Project, ProjectParameters } from '../domain/Project';
 import { API_URL } from '../config';
-import { dispatchProjectEvent } from '../communication/events';
 
 interface IProjectContext {
   project?: Project;
@@ -60,7 +59,6 @@ export const ProjectProvider: React.FC = ({ children }) => {
           );
           if (project) {
             setProject(project);
-            dispatchProjectEvent(project);
             setContributors(contributors);
           }
         }
@@ -93,7 +91,6 @@ export const ProjectProvider: React.FC = ({ children }) => {
 
       if (project) {
         setProject(project);
-        dispatchProjectEvent(project);
         setContributors(contributors);
       }
     }

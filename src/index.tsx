@@ -8,34 +8,35 @@ import * as serviceWorker from './serviceWorker';
 
 declare global {
   interface Window {
-    renderKanban(containerId: string, history: History): void;
-    unmountKanban(containerId: string): void;
+    renderKanban(history: History): void;
+    unmountKanban(): void;
   }
 }
 
-window.renderKanban = (containerId, history) => {
+const container = document.getElementById('Kanban-container');
+
+if (!container) {
+  const history = createBrowserHistory();
+  ReactDOM.render(<App history={history} />, document.getElementById('root'));
+}
+
+window.renderKanban = (history) => {
   ReactDOM.render(
     <React.StrictMode>
       <ColorModeScript />
       <App history={history} />
     </React.StrictMode>,
-    document.getElementById(containerId)
+    container
   );
   serviceWorker.unregister();
 };
 
-window.unmountKanban = (containerId) => {
-  const appElement = document.getElementById(containerId);
-  if (!appElement) {
+window.unmountKanban = () => {
+  if (!container) {
     return;
   }
-  ReactDOM.unmountComponentAtNode(appElement);
+  // ReactDOM.unmountComponentAtNode(container);
 };
-
-if (!document.getElementById('Kanban-container')) {
-  const history = createBrowserHistory();
-  ReactDOM.render(<App history={history} />, document.getElementById('root'));
-}
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
