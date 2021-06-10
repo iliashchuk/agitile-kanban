@@ -19,7 +19,7 @@ interface ITicketContext {
   ticketsLoading: boolean;
   completeSubtask(ticketId: string, subtaskId: string): void;
   submitTicket(ticket: Ticket): Promise<Ticket>;
-  changeTicketState(ticketId: string, status: TicketStatus): void;
+  changeTicketStatus(ticketId: string, status: TicketStatus): void;
 }
 
 export const TicketContext = createContext<ITicketContext>(
@@ -58,7 +58,7 @@ export const TicketProvider: React.FC = ({ children }) => {
     [fetchAndSetTickets, put]
   );
 
-  const changeTicketState: ITicketContext['changeTicketState'] = useCallback(
+  const changeTicketStatus: ITicketContext['changeTicketStatus'] = useCallback(
     async (ticketId, status) => {
       try {
         await updateAndRefetchTicket({ _id: ticketId, status });
@@ -69,6 +69,12 @@ export const TicketProvider: React.FC = ({ children }) => {
     },
     [updateAndRefetchTicket]
   );
+
+  useEffect(() => {
+    changeTicketStatusRef.current = changeTicketStatus;
+  }, [changeTicketStatus]);
+
+  const changeTicketStatusRef = useRef(changeTicketStatus);
 
   useEffect(() => {
     function handleMergeEvent({
@@ -83,7 +89,7 @@ export const TicketProvider: React.FC = ({ children }) => {
         });
 
         if (branchTicket) {
-          changeTicketState(branchTicket._id, TicketStatus.Review);
+          changeTicketStatusRef.current(branchTicket._id, TicketStatus.Review);
         }
       }
     }
@@ -143,7 +149,7 @@ export const TicketProvider: React.FC = ({ children }) => {
         completeSubtask,
         ticketsLoading,
         submitTicket,
-        changeTicketState,
+        changeTicketStatus,
       }}
     >
       {children}
