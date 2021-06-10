@@ -71,6 +71,12 @@ export const TicketProvider: React.FC = ({ children }) => {
   );
 
   useEffect(() => {
+    changeTicketStateRef.current = changeTicketState;
+  }, [changeTicketState]);
+
+  const changeTicketStateRef = useRef(changeTicketState);
+
+  useEffect(() => {
     function handleMergeEvent({
       detail: branches,
     }: Event & { detail: string[] }) {
@@ -83,7 +89,7 @@ export const TicketProvider: React.FC = ({ children }) => {
         });
 
         if (branchTicket) {
-          changeTicketState(branchTicket._id, TicketStatus.Review);
+          changeTicketStateRef.current(branchTicket._id, TicketStatus.Review);
         }
       }
     }
