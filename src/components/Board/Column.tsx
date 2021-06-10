@@ -12,7 +12,7 @@ interface Props {
 }
 
 export const Column: React.FC<Props> = ({ tickets, status }) => {
-  const { changeTicketState } = useContext(TicketContext);
+  const { changeTicketStatus: changeTicketState } = useContext(TicketContext);
 
   const [{ isOver }, drop] = useDrop<Ticket, void, { isOver: boolean }>(() => ({
     accept: TicketDNDTypes.TICKET,
